@@ -745,13 +745,49 @@ end
 -->8
 --levels
 alternate = function(b)
-
 	if t%2 > 1 then
 		b[3]=0
 	else
 		b[3]=2
 	end
 end
+drop = function(b)
+	if not b.oy then
+		b.oy=b[6]
+	end
+	if not b.ow then
+		b.ow=b[3]
+	end
+ b.t=b.t and b.t or 0
+	
+	if b.t < 0 then
+		b[3]=time()%.3>.15 and 0 or b.ow
+		b.colide=false
+	else
+		b[3]=b.ow
+		b.colide=true
+	end
+	
+	if player.block == b then
+		b.t+=1/30
+		b[5]+=sin(t*10)*.2
+	elseif b.t <=0 then
+		b.t+=1/30
+	end	
+	
+	if b.t >= .7 then
+				b.dy = b.dy or 0
+				b.dy += .02
+				b[6] += b.dy
+	end
+	
+	if b[6] - b.oy > 100 then
+			b.t=-1
+			b[6] = b.oy
+			b.dy=0
+	end
+end
+
 night={0,-16,-4,1,
 						0,5,6,8,
 						-3,-1,12,12,
@@ -837,14 +873,10 @@ test1={
 		15,16,
 		5,15
 	},{
-		78,3,
-		15,16,
-		5,-2,
-	},
-	{
-		63,3,
-		1,1,
-		5,-5
+		88,18,
+		2,1,
+		123/8,12,
+		update=drop
 	}
 }
 
