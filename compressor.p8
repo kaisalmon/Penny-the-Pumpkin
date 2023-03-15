@@ -72,6 +72,9 @@ function _update()
 			if selected_action == 1 then
 				compress_from_playarea(selected_key)
 			end
+			if selected_action ==2 then
+				decompress_to_playarea(selected_key)
+			end
 			sfx(0)
 		end
 		button_down=btn(4)
@@ -388,8 +391,16 @@ compress_from_playarea(selected_key)
 	cstore(_map+128*dst_offset, _map+128*dst_offset, 128*3, "blob.p8")
 end
 
-function decompress_to_playarea
-	//todo
+function decompress_to_playarea(selected_key)
+	dst_offset=3
+	src_offset=19+3*(selected_key-1)
+	
+	// load chunk of memory from 'blob.p8' 
+	reload(_map+128*src_offset, _map+128*src_offset, 128*3, 'blob.p8')
+
+	px9_decomp(0,dst_offset,0x2000+128*src_offset,mget,mset)
+	cstore(_map+128*dst_offset, _map+128*dst_offset, 128*16, "blob.p8")
+
 end
 __gfx__
 000000001111000000001111111110000001111100000000000000005000000000000000000000051113333333333311111111115353333333333b3b00000000
