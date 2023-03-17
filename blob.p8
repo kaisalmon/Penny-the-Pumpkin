@@ -48,13 +48,9 @@ end
 function _draw()
 	local stat_1 = stat(1)
 	cls(1)
-	color(0)
-	
 	pal()
 	palt(0,false)
 	palt(1,true)
-	pal(1,138 ,1)
-	pal(5,147, 1)
 	
 	pal(blocks.pal or {1,2,3,4,
 						5,6,7,8,
@@ -139,7 +135,6 @@ function _update60()
 		hud_y += 1
 	end
 	
-	
 	if died_at and died_at < time() - 2 then
 		load_level(blocks)
 		died_at = nil
@@ -151,6 +146,39 @@ function _update60()
 	end
 	
 	for e in all(enemies) do
+		update_enemy(e)
+	end
+	
+	foreach(coins, function(c)
+		update_coin(c)
+	end)
+	
+	for b in all(blocks) do
+		if(b.update)b.update(b)
+	end
+
+	update_camera()
+	update_dust()
+	update_cpu_usage = stat(1) - stat_1
+end
+
+function update_coin(c)
+	if player.x>c.x-8
+		and player.x<c.x+8
+		and player.h.y>c.y-16
+		and player.h.y<c.y then
+			del(coins,c)
+			sfx(7)
+			dset(c.id, 1)
+			coins_collected+=1
+			coin_at=time()
+			for i = 0,15 do
+				add_dust(c,rnd(),1,true,55,"coin")
+			end
+		end
+end
+
+function update_enemy(e)
 		if rnd() < 0.01 or e.dir == nil then
 			local r=rnd()
 			if r<0.33 then 
@@ -184,62 +212,39 @@ function _update60()
 				end
 			end
 		end
-	end
-	
-	foreach(coins, function(c)
-		if player.x>c.x-8
-		and player.x<c.x+8
-		and player.h.y>c.y-16
-		and player.h.y<c.y then
-			del(coins,c)
-			sfx(7)
-			dset(c.id, 1)
-			coins_collected+=1
-			coin_at=time()
-			for i = 0,15 do
-				add_dust(c,rnd(),1,true,55,"coin")
-			end
-		end
-	end)
-	
-	for b in all(blocks) do
-		if(b.update)b.update(b)
-	end
-	
+end
+
+function update_camera()
 	cam_x += ( player.x-cam_x-64)
 		*0.1
 	cam_y += ( player.y-cam_y-64)
 	*0.1
-		
-	if true then
-		if cam_x > player.x - 64 + 50 then
-			cam_x = player.x - 64 + 50
-		end
-		if cam_x < player.x - 64 - 50 then
-			cam_x = player.x - 64 - 50
-		end
-		if cam_y > player.y - 64 + 50 then
-			cam_y = player.y - 64 + 50
-		end
-		if cam_y < player.y - 64 - 50 then
-			cam_y = player.y - 64 - 50
-		end
-		
-		if cam_x < cam_bounds[1] then
-			cam_x = cam_bounds[1]
-		end
-		if cam_x > cam_bounds[2] then
-			cam_x = cam_bounds[2]
-		end
-		if cam_y < cam_bounds[3] then
-			cam_y = cam_bounds[3]
-		end
-		if cam_y > cam_bounds[4] then
-			cam_y = cam_bounds[4]
-		end
+			
+	if cam_x > player.x - 64 + 50 then
+		cam_x = player.x - 64 + 50
 	end
-	update_dust()
-	update_cpu_usage = stat(1) - stat_1
+	if cam_x < player.x - 64 - 50 then
+		cam_x = player.x - 64 - 50
+	end
+	if cam_y > player.y - 64 + 50 then
+		cam_y = player.y - 64 + 50
+	end
+	if cam_y < player.y - 64 - 50 then
+		cam_y = player.y - 64 - 50
+	end
+	
+	if cam_x < cam_bounds[1] then
+		cam_x = cam_bounds[1]
+	end
+	if cam_x > cam_bounds[2] then
+		cam_x = cam_bounds[2]
+	end
+	if cam_y < cam_bounds[3] then
+		cam_y = cam_bounds[3]
+	end
+	if cam_y > cam_bounds[4] then
+		cam_y = cam_bounds[4]
+	end
 end
 
 function update_character(ch, move_dir, jump, squeeze)
@@ -502,9 +507,8 @@ function is_colide(x,y,w,inc_semi)
 			y=y,
 			x=x2,
 		},inc_semi)
-		if b then
-			return b,tile
-		end
+		if(b)return b,tile
+	
 	end
 	return false
 end
