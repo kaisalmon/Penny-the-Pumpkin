@@ -4,6 +4,7 @@ __lua__
 --main
 function init()
 t=0
+wipe_progress = -1  -- -1: no transition, 0-128: transition in progress
 dust={}
 coins_collected=0
 player = {
@@ -34,7 +35,7 @@ died_at=nil
 revived_at=nil
 fire_at=nil
 local level=dget(63)
-load_level(levels[level] or level1)
+load_level_instant(levels[level] or level1)
 hud_y=-25
 coin_at=nil
 g1=0.1
@@ -92,7 +93,7 @@ function _draw()
 	end)
 	draw_dust()
 	camera()
-	
+	draw_wipe_transition()
 	local draw_cpu_usage = stat(1) - stat_1
 
 	if debug then
@@ -119,6 +120,29 @@ function _draw()
 	print(coins_collected.."/3",22,115,7)
 end
 
+function draw_wipe_transition()
+    if(wipe_progress <0)return
+    local p = (wipe_progress < 1 and wipe_progress or 2 - wipe_progress)
+				p=sqrt(p)
+    -- calculate the circle's radius based on the progress
+    local radius = 140 * (1 - p)
+
+    -- calculate the circle's center coordinates
+    local cx = player.x
+    local cy = (player.y + player.h.y) / 2
+
+    -- draw the circular mask
+       for x = -128, 128, 1 do
+        local dx = x + cx - cam_x
+        local dy = sqrt(radius * radius - x * x)
+        local y1 = cy - dy - cam_y
+        local y2 = cy + dy - cam_y
+
+        line(dx, 0, dx, y1, 0)  -- draw a line from the top to the top of the circle
+        line(dx, y2, dx, 128, 0)  -- draw a line from the bottom of the circle to the bottom
+    end
+end
+
 function _update60()
 	profile_cpu_usage=0
 	profile_calls=0
@@ -134,6 +158,21 @@ function _update60()
 	elseif hud_y < thud_y then
 		hud_y += 1
 	end
+
+	update_camera()
+	
+ if wipe_progress >= 0 then
+  wipe_progress += 0.03  -- adjust this value to control the speed of the transition
+  if wipe_progress > 1 and transition_function then
+   -- execute the stored function when the wipe effect reaches the halfway point
+   transition_function()
+   transition_function = nil  -- clear the function
+		elseif wipe_progress > 2 then
+   wipe_progress = -1
+  end
+  if(wipe_progress<1)return
+
+ end
 	
 	if died_at and died_at < time() - 2 then
 		load_level(blocks)
@@ -157,7 +196,6 @@ function _update60()
 		if(b.update)b.update(b)
 	end
 
-	update_camera()
 	update_dust()
 	update_cpu_usage = stat(1) - stat_1
 end
@@ -1020,51 +1058,64 @@ function calc_cam_bounds()
 		end
 	end 
 end
+transition_function = nil
+
+function transition(func)
+    transition_function = func
+    wipe_progress = 0  -- start wipe effect
+end
+
+function load_level_instant(level,x,y)
+			if level.chunk then
+				px9_decomp(0,3,0x2000+128*level.chunk,mget,mset)
+			else
+				reload(0x2000,0x2000,128*19)
+			end
+			
+			for i, v in ipairs(levels) do
+				 if v == level then
+				 	dset(63, i)
+				 	break
+				 end
+			end 
+			
+			blocks=level
+			calc_cam_bounds()
+			if x != nil then
+				level.px = x
+			end
+			if y != nil then
+				level.py = y
+			end
+			player.x = level.px or player.x
+			player.y = level.py or player.y
+			player.h.x = player.x
+			player.h.y = player.y+player.size
+			player.dx = 0
+			player.dy = 0
+			player.h.dx = 0
+			player.h.dy = 0
+			
+			enemies={}
+			coins={}
+			for e in all(level.e or {}) do
+				spawn_enemy(e)
+			end
+			for c in all(level.c or {}) do
+				if 	dget(c.id) == 0 then
+					spawn_coin(c)
+				end
+			end
+			
+			cam_x = player.x - 64
+			cam_y = player.y - 100
+end
+
 
 function load_level(level, x, y)
-	if level.chunk then
-		px9_decomp(0,3,0x2000+128*level.chunk,mget,mset)
-	else
-		reload(0x2000,0x2000,128*19)
-	end
-	
-	for i, v in ipairs(levels) do
-		 if v == level then
-		 	dset(63, i)
-		 	break
-		 end
-	end 
-	
-	blocks=level
-	calc_cam_bounds()
-	if x != nil then
-		level.px = x
-	end
-	if y != nil then
-		level.py = y
-	end
-	player.x = level.px or player.x
-	player.y = level.py or player.y
-	player.h.x = player.x
-	player.h.y = player.y+player.size
-	player.dx = 0
-	player.dy = 0
-	player.h.dx = 0
-	player.h.dy = 0
-	
-	enemies={}
-	coins={}
-	for e in all(level.e or {}) do
-		spawn_enemy(e)
-	end
-	for c in all(level.c or {}) do
-		if 	dget(c.id) == 0 then
-			spawn_coin(c)
-		end
-	end
-	
-	cam_x = player.x - 64
-	cam_y = player.y - 100
+		transition(function()
+			load_level_instant(level,x,y)
+		end)
 end
 function spawn_coin(c)
 	add(coins, {
