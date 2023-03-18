@@ -1270,9 +1270,13 @@ function set_checkpoint(level, x,y,dx,dy)
 end
 
 function load_level(level, x, y, dx, dy)
-	transition(function()
-		 load_level_instant(level, x, y, dx, dy)
-	end)
+	if blocks == level then
+		load_level_instant(level, x, y, dx, dy)
+	else
+		transition(function()
+			 load_level_instant(level, x, y, dx, dy)
+		end)
+	end
 end
 function spawn_coin(c)
 	add(coins, {
