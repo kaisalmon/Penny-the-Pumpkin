@@ -1347,8 +1347,8 @@ end
 -->8
 --init
 function _init()
-	--cartdata("kai-pumkin")--6 coins
-	cartdata("kai-pumkin2")
+	cartdata("kai-pumkin")--6 coins
+	--cartdata("kai-pumkin2")
 	
 	coins_collected=0
 	for i = 0,30 do
@@ -1372,9 +1372,12 @@ sr_coins={}
 function speedrun_init()
 	add_speedrun_option()
 	coins_collected=0
+	level1.px=20
+	level1.py=100
 	load_level(level1,
 	 level1.px,
   level1.py)
+
 end
 __gfx__
 000000001111000000001111111110000001111144499444005555605000000000000000000000051113333333333311111111115353333333333b3b00000000
