@@ -2,11 +2,11 @@ pico-8 cartridge // http://www.pico-8.com
 version 36
 __lua__
 --main
+max_coins=6
 function init()
 t=0
 fc=0
 dust={}
-coins_collected=0
 player = {
 	on_land=on_land,
 	x=0,
@@ -42,13 +42,12 @@ load_level(
   dget(60), dget(59)
   )
 hud_y=-25
-coin_at=nil
 g1=0.1
 g2=0.275
 air=0.01
 max_jump_height=8*4.1
 player.jumpf=-3
---debug="test"
+speedrun_t=0
 end
 
 function _draw()
@@ -124,7 +123,27 @@ function _draw()
 	rectfill(0,128+8-hud_h,128,128,0)
 	sspr(24,0,16,16,3,109,16,16)
 
-	print(coins_collected.."/4",22,115,7)
+	if coins_collected == max_coins and
+	not speedrun 
+	and fc % 50 < 25 then		
+		print("speedrun unlocked in menu!",22,115,fc % 10 < 5 and 6 or 7)
+	else
+		print(coins_collected.."/"..max_coins,22,115,6)
+	end
+	camera()
+	if speedrun then
+		rectfill(99,0,128,6,0)
+		local m =flr(speedrun_t/60)
+		local s = flr(speedrun_t%60)
+		local ms = flr(10*(speedrun_t%1))
+		if s < 10 then
+			s="0"..s
+		end
+		if m < 10 then
+			m="0"..m
+		end
+		print(m..":"..s.."."..ms,100,1,7)
+	end
 end
 
 function _update60()
@@ -132,10 +151,18 @@ function _update60()
 	profile_calls=0
 	local stat_1 = stat(1)
 	t+=1/60
+	if coins_collected < max_coins then
+		speedrun_t=time()
+	end
 	fc+=1
 	
 	local thud_y = -25
 	if coin_at and coin_at+2>time() then
+		thud_y = 0
+	end
+	if coins_collected == max_coins and
+	not speedrun then	
+		add_speedrun_option()
 		thud_y = 0
 	end
 	if hud_y > thud_y then
@@ -179,6 +206,7 @@ function update_coin(c)
 			del(coins,c)
 			sfx(7)
 			dset(c.id, 1)
+			sr_coins[c.id]=true
 			coins_collected+=1
 			coin_at=time()
 			set_checkpoint(blocks,player.x,player.y-5,0,0)
@@ -1217,7 +1245,7 @@ function set_checkpoint(level, x,y,dx,dy)
 	
 	
 	for i, v in ipairs(levels) do
-		 if v == level then
+		 if v == level and not speedrun then
 		 	dset(63, i)
 		 	dset(62, flr(level.px/8))
 		 	dset(61, flr(level.py/8))
@@ -1261,8 +1289,14 @@ function load_level(level, x, y, dx, dy)
 		spawn_enemy(e)
 	end
 	for c in all(level.c or {}) do
-		if 	dget(c.id) == 0 then
-			spawn_coin(c)
+		if speedrun then
+			if	not sr_coins[c.id]  then
+				spawn_coin(c)
+			end
+		else
+			if	dget(c.id) == 0  then
+				spawn_coin(c)
+			end
 		end
 	end
 	
@@ -1309,15 +1343,38 @@ function spawn_enemy(e)
 end	
 
 
+
+-->8
+--init
 function _init()
-	cartdata("kai-pumkin")
-	init()
+	--cartdata("kai-pumkin")--6 coins
+	cartdata("kai-pumkin2")
+	
+	coins_collected=0
 	for i = 0,30 do
 		if dget(i)==1 then
 			coins_collected+=1	
 			coin_at=time()		
 		end
 	end
+	speedrun=coins_collected>=max_coins
+	init()
+	if(speedrun)speedrun_init()
+end
+
+function add_speedrun_option()
+	menuitem(5,"start speedrun",function()
+		extcmd("reset")
+	end)
+end
+
+sr_coins={}
+function speedrun_init()
+	add_speedrun_option()
+	coins_collected=0
+	load_level(level1,
+	 level1.px,
+  level1.py)
 end
 __gfx__
 000000001111000000001111111110000001111144499444005555605000000000000000000000051113333333333311111111115353333333333b3b00000000
