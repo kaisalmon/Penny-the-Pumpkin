@@ -102,7 +102,7 @@ function _draw()
 	draw_blocks(true)	
 	camera()
 	draw_wipe_transition(wipe_progress)
-	if(blocks==level3)	draw_wipe_transition(.5)
+	if(blocks==level3)	draw_wipe_transition(.35)
 	local draw_cpu_usage = stat(1) - stat_1
 
 	if debug then
