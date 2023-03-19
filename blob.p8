@@ -5,6 +5,7 @@ __lua__
 max_coins=6
 function init()
 t=0
+wipe_progress = -1  -- -1: no transition, 0-128: transition in progress
 fc=0
 dust={}
 player = {
@@ -35,7 +36,7 @@ died_at=nil
 revived_at=nil
 fire_at=nil
 local level=dget(63)
-load_level(
+load_level_instant(
 	levels[level] or level1,
 	 (dget(63)!=0 and (dget(62)*8+4) or level1.px),
  	(dget(63)!=0 and (dget(61)*8+4) or level1.py),
@@ -99,7 +100,8 @@ function _draw()
 	
 	draw_blocks(true)	
 	camera()
-	
+	draw_wipe_transition(wipe_progress)
+	if(blocks==level3)	draw_wipe_transition(.35)
 	local draw_cpu_usage = stat(1) - stat_1
 
 	if debug then
@@ -146,6 +148,29 @@ function _draw()
 	end
 end
 
+function draw_wipe_transition(wipe_progress)
+    if(wipe_progress <0)return
+    local p = (wipe_progress < 1 and wipe_progress or 2 - wipe_progress)
+				p=sqrt(p)
+    -- calculate the circle's radius based on the progress
+    local radius = 140 * (1 - p)
+
+    -- calculate the circle's center coordinates
+    local cx = player.x
+    local cy = (player.y + player.h.y) / 2
+
+    -- draw the circular mask
+       for x = -128, 128, 1 do
+        local dx = x + cx - cam_x
+        local dy = sqrt(radius * radius - x * x)
+        local y1 = cy - dy - cam_y
+        local y2 = cy + dy - cam_y
+
+        line(dx, 0, dx, y1, 0)  -- draw a line from the top to the top of the circle
+        line(dx, y2, dx, 128, 0)  -- draw a line from the bottom of the circle to the bottom
+    end
+end
+
 function _update60()
 	profile_cpu_usage=0
 	profile_calls=0
@@ -170,6 +195,21 @@ function _update60()
 	elseif hud_y < thud_y then
 		hud_y += 1
 	end
+
+	update_camera()
+	
+ if wipe_progress >= 0 then
+  wipe_progress += 0.03  -- adjust this value to control the speed of the transition
+  if wipe_progress > 1 and transition_function then
+   -- execute the stored function when the wipe effect reaches the halfway point
+   transition_function()
+   transition_function = nil  -- clear the function
+		elseif wipe_progress > 2 then
+   wipe_progress = -1
+  end
+  if(wipe_progress<1)return
+
+ end
 	
 	if died_at and died_at < time() - 1 then
 		load_level(blocks,blocks.px,blocks.py,blocks.dpx,blocks.pdy)
@@ -193,7 +233,6 @@ function _update60()
 		if(b.update)b.update(b)
 	end
 
-	update_camera()
 	update_dust()
 	update_cpu_usage = stat(1) - stat_1
 end
@@ -1232,6 +1271,7 @@ function calc_cam_bounds()
 		end
 	end 
 end
+transition_function = nil
 
 function set_checkpoint(level, x,y,dx,dy)
 		if x != nil then
@@ -1255,9 +1295,13 @@ function set_checkpoint(level, x,y,dx,dy)
 		 end
 	end
 end
+function transition(func)
+    transition_function = func
+    wipe_progress = 0  -- start wipe effect
+end
 
-function load_level(level, x, y, dx, dy)
-	if level.chunk then
+function load_level_instant(level,x,y,dx,dy)
+		if level.chunk then
 		reload(
 			0x2000+128*level.chunk,
 			0x2000+128*level.chunk,
@@ -1305,6 +1349,40 @@ function load_level(level, x, y, dx, dy)
 	
 	check_for_squeeze(player)	
 end
+
+
+function set_checkpoint(level, x,y,dx,dy)
+		if x != nil then
+		level.px = x
+	end
+	if y != nil then
+		level.py = y
+	end
+	level.pdx = dx or 0
+	level.pdy = dy or 0
+	
+	
+	for i, v in ipairs(levels) do
+		 if v == level then
+		 	dset(63, i)
+		 	dset(62, flr(level.px/8))
+		 	dset(61, flr(level.py/8))
+		 	dset(60, flr(level.pdx))
+		 	dset(59, flr(level.pdy))
+		 	break
+		 end
+	end
+end
+
+function load_level(level, x, y, dx, dy)
+	if blocks == level then
+		load_level_instant(level, x, y, dx, dy)
+	else
+		transition(function()
+			 load_level_instant(level, x, y, dx, dy)
+		end)
+	end
+end
 function spawn_coin(c)
 	add(coins, {
 		x=c.x*8,
@@ -1347,8 +1425,8 @@ end
 -->8
 --init
 function _init()
-	--cartdata("kai-pumkin")--6 coins
-	cartdata("kai-pumkin2")
+	cartdata("kai-pumkin")--6 coins
+	--cartdata("kai-pumkin2")
 	
 	coins_collected=0
 	for i = 0,30 do
@@ -1372,7 +1450,7 @@ sr_coins={}
 function speedrun_init()
 	add_speedrun_option()
 	coins_collected=0
-	load_level(level1,
+	load_level_instant(level1,
 	 level1.px,
   level1.py)
 end
