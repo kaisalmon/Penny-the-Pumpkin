@@ -176,9 +176,7 @@ function _update60()
 	profile_calls=0
 	local stat_1 = stat(1)
 	t+=1/60
-	if coins_collected < max_coins then
-		speedrun_t=time()
-	end
+
 	fc+=1
 	
 	local thud_y = -25
@@ -208,8 +206,11 @@ function _update60()
    wipe_progress = -1
   end
   if(wipe_progress<1)return
-
  end
+ 
+ if coins_collected < max_coins then
+		speedrun_t+=1/60
+	end
 	
 	if died_at and died_at < time() - 1 then
 		load_level(blocks,blocks.px,blocks.py,blocks.dpx,blocks.pdy)
@@ -1450,9 +1451,12 @@ sr_coins={}
 function speedrun_init()
 	add_speedrun_option()
 	coins_collected=0
+	level1.px=20
+	level1.py=100
 	load_level_instant(level1,
 	 level1.px,
   level1.py)
+
 end
 __gfx__
 000000001111000000001111111110000001111144499444005555605000000000000000000000051113333333333311111111115353333333333b3b00000000
