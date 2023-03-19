@@ -244,12 +244,20 @@ function update_camera()
 	end
 end
 
-function update_character(ch, move_dir, jump, squeeze, jump_held)
+function lerp(a, b, t)
+  return a + (b - a) * t
+end
+
+function update_character(ch, move_dir, jump, t_stretch, jump_held)
 	if (move_dir < 0) ch.dx -= ch.speed or .2
 	if (move_dir > 0) ch.dx += ch.speed or .2
+	t_stretch= t_stretch or 1
+	ch.stretch = ch.stretch and (
+		 lerp(ch.stretch, t_stretch, .1)
+	) or t_stretch
 
 	ch.tile = t1 or t0 or t2
-
+	
 	ch.gnded = not not ch.block
 	if ch.gnded then
 		ch.last_gnded=time()
@@ -288,7 +296,7 @@ function update_character(ch, move_dir, jump, squeeze, jump_held)
 	ch.h.dx *= 0.96
 	ch.h.dy *= 0.95
 
-	local h = ch.size * (squeeze or 1)
+	local h = ch.size * ch.stretch
 	if(not ch.gnded and not ch.was_gnded) h=ch.size
 	local fh=0.015
 	if(ch.size < 12)fh*=2 
@@ -324,7 +332,7 @@ function update_character(ch, move_dir, jump, squeeze, jump_held)
 	update_particle(ch.h, false)
 	check_for_squeeze(ch)
 
-	local max_h = ch.size*1.75
+	local max_h = ch.size*ch.stretch*1.25
 	if ch.h.y + max_h < ch.y then
 		ch.h.y = ch.y-max_h
 		eject_particle(ch.h, false, 0.5, 1)
@@ -385,7 +393,7 @@ function update_player()
 	update_character(player, 
 		btn(0) and -1 or btn(1) and 1 or 0,
 		jump_btn_down and jump_btn and jump_btn >= time() - 0.25,
-		(btn(3) and .5 or btn(2) and 1.5 or 1),
+		(btn(3) and .5 or btn(2) and 1.6 or 1),
 		jump_btn_down
 	)
 
@@ -521,8 +529,8 @@ function check_for_squeeze(p)
 		
 end
 
-function is_colide(x,y,w,inc_semi)
-	local xs =  {x}
+function is_colide(x,y,w,inc_semi, h)
+	local xs,ys = {x},{y}
 	if w then 
 		xs = {}
 		for dx=-w/2,w/2,7 do
@@ -530,14 +538,16 @@ function is_colide(x,y,w,inc_semi)
 		end
 		add(xs, x+w/2)
 	end
+	if(h)add(ys, (y+h.y)/2)
 	
-	for i,x2 in ipairs(xs) do
-		local b,tile = is_solid({
-			y=y,
-			x=x2,
-		},inc_semi)
-		if(b)return b,tile
-	
+	for _,y2 in ipairs(ys) do
+		for i,x2 in ipairs(xs) do
+			local b,tile = is_solid({
+				y=y2,
+				x=x2,
+			},inc_semi)
+			if(b)return b,tile
+		end
 	end
 	return false
 end
@@ -582,8 +592,7 @@ end
 function update_particle(p, inc_semi)
 	eject_particle(p, inc_semi, 1, 1)
 
-	x_col = is_colide(p.x+p.dx,p.y,p.w)
-									or p.h and is_colide(p.x+p.dx,(p.y+p.h.y)/2,p.w)
+	x_col = is_colide(p.x+p.dx,p.y,p.w,false)
 	if not x_col then
 		p.x += p.dx
 	else
@@ -592,7 +601,6 @@ function update_particle(p, inc_semi)
 	end
 	
 	y_col,tile = is_colide(p.x,p.y+p.dy,p.w,inc_semi)
-														or p.h and is_colide(p.x,(p.y+p.h.y)/2+p.dy,p.w)
 	if not y_col  then
 		 p.y += p.dy
 	else
