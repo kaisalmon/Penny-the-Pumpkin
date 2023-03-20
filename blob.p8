@@ -274,8 +274,8 @@ function update_enemy(e)
     if do_characters_overlap(e,player) and e.h.y+th>player.y then
       sfx(0)
       player.y=e.h.y-2
-      player.dy-=3.5
-      player.h.dy-=5.5
+      player.dy=-4.5
+      player.h.dy=-6.5
       e.h.dy+=2
       e.dy+=2
     elseif do_characters_overlap_forgiving(e,player) then
@@ -963,7 +963,7 @@ level2={
 			48,3,--size
 			0,-3,--dst
 			update=function(b)
-					if player.x < 0 then
+					if player.x < 0 and player.y < 100 then
 						load_level(level1,31.5*8,6*8)
 					elseif player.y > 34*8 then
 						if player.x>250 then
@@ -1088,10 +1088,6 @@ level3={
 		58,16,
 		0,0,
 		update=function()
-			if btn(5) then
-				player.x=620
-				player.h.x=620
-			end
 			if fc%10==0 then
 				for x=0,128 do
 				for y=3,19 do
