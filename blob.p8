@@ -1,7 +1,7 @@
 pico-8 cartridge // http://www.pico-8.com
 version 36
 __lua__
---main
+--penny the pumpkin
 function init()
 t=0
 fc=0
@@ -854,21 +854,15 @@ level1={
 	{
 			rx=2,
 			colide=false,
-			32,5,--src
-			16,9,--size
-			0,0,--dst
+			"32,5,16,9,0,0",
 	},
 	{
 			rx=2,ry=5,
 			colide=false,
-			32,12,--src
-			16,1,--size
-			0,8,--dst
+			"32,12,16,1,0,8"
 	},
 	{
-			0,3,--src
-			32,16,--size
-			0,0,--dst,
+			"0,3,32,16,0,0",
 			update=function(b)
 					if player.x/8 > b[3]+b[5] then
 						load_level(level2, 5, 30)
@@ -891,9 +885,7 @@ level2={
 	{
 			fill=3,
 			colide=false,
-			6,5,--src
-			48,3,--size
-			0,-3,--dst
+			"6,5,48,3,0,-3",
 			update=function(b)
 					if player.x < 0 and player.y < 100 then
 						load_level(level1,31.5*8,6*8)
@@ -911,82 +903,44 @@ level2={
 	{
 			rx=3,
 			colide=false,
-			32,5,--src
-			16,9,--size
-			0,0,--dst
+			"32,5,16,9,0,0"
 	},
 	{
 			rx=3,ry=9,
 			colide=false,
-			32,12,--src
-			16,1,--size
-			0,8,--dst
+			"32,12,16,1,0,8"
 	},
 	{
 			tile=true,
 			colide=false,
-			18,0,--src
-			48,3,--size
-			0,16,--dst
+			"18,0,48,3,0,16"
 	},
 		{
 			fill=4,
 			colide=false,
-			18,0,--src
-			48,13,--size
-			0,19,--dst
+			"18,0,48,13,0,19"
 	},
-	{
-			48,3,--src
-			16,16,--size
-			0,0,--dst
-	},
-	{
-			64,3,--src
-			48,16,--size
-			0,16,--dst
-	},
-	{
-			112,3,--src
-			16,16,--size
-			32,0,--dst
-	},
+		"48,3,16,16,0,0",
+		"64,3,48,16,0,16",
+		"112,3,16,16,32,0",
 	{
 			front=true,
-			32,14,--src
-			6,4,--size
-			29,12,--dst
+			"32,14,6,4,29,12"
 	},
 	{
 			front=true,
 			colide=false,
-			106,3,--src
-			4,4,--size
-			0,28,--dst
+			"106,3,4,4,0,28"
 	},
 	{
 			colide=false,
 			rx=3,ry=3,
 			front=true,
-			31,18,--src
-			1,1,--size
-			31,14,--dst
+			"31,18,1,1,31,14"
 	},
-	{
-			25,8,--src
-			3,5,--size
-			21,11,--dst
-	},
-	{
-			114,14,--src
-			5,1,--size
-			20,14,--dst
-	},
-	{
-			21,11,--src
-			1,2,--size
-			20,14,--dst
-	},
+	"25,8,3,5,21,11",
+	"114,14,5,1,20,14",
+	"21,11,1,2,20,14",
 }
 
 level3={
@@ -1004,21 +958,15 @@ level3={
 		{x=86.5,y=11, minx=670, maxx=770}
 	},
 	{
-		32,1,
-		3,1,
-		30,10,
+		"32,1,3,1,30,10",
 		update=drop
 	},
 	{
-		32,1,
-		3,1,
-		36,8,
+		"32,1,3,1,36,8",
 		update=drop
 	},
 	{
-		0,3,--src,
-		58,16,
-		0,0,
+		"0,3,58,16,0,0",
 		update=function()
 			if fc%10==0 then
 				for x=0,128 do
@@ -1042,27 +990,15 @@ level3={
 		end
 	},
 	{
-		32,1,
-		3,1,
-		60,5,
+		"32,1,3,1,60,5",
 		update=drop
 	},
 	{
-		32,1,
-		3,1,
-		66,3,
+		"32,1,3,1,66,3",
 		update=drop
 	},
-	{
-		27,13,
-		16,6,
-		58,5
-	},
-	{
-		58,3,--src,
-		58,16,
-		74,0,
-	}	
+		"27,13,16,6,58,5",
+	"58,3,58,16,74,0"	
 }
 
 level4={
@@ -1083,9 +1019,7 @@ level4={
 		miny=61, maxy=90},
 	},
 	{
-		35,0,
-		6,3,
-		4,5,
+		"35,0,6,3,4,5",
 		rx=7,
 		colide=false,
 		update=function()
@@ -1097,22 +1031,12 @@ level4={
 		end
 	},
 	{
-		35,0,
-		44,14,
-		4,8,
+		"35,0,44,14,4,8",
 		colide=false,
 		fill=6
 	},
-	{
-		0,3,
-		48,16,
-		0,0
-	},
-	{
-		48,3,
-		48,16,
-		0,16
-	},
+	"0,3,48,16,0,0",
+	"48,3,48,16,0,16",
 	--{
 --		96,3,
 --		32,16,
@@ -1125,21 +1049,15 @@ level4={
 --		32,32
 --	},
 	{
-		30,0,
-		2,1,
-		12,21,
+		"30,0,2,1,12,21",
 		update=alternate
 	},
 	{
-		30,0,
-		2,1,
-		17,23,
+		"30,0,2,1,17,23",
 		update=alternate
 	},
 	{
-		40,6,
-		4,7,
-		42,12,
+		"40,6,4,7,42,12",
 		front=true
 	}
 }
@@ -1149,8 +1067,18 @@ levels={
 }
 -->8
 --level loading
-function is_solid(p,inc_semi)
+function preload(t)
+	if type(t) == "table" then
+		new = {}
+		for i, v in pairs(t) do new[i] = v end
+		split_str = split(t[1])
+		for i, v in pairs(split_str) do new[i] = v end
+		return new
+	end
+	return split(t)
+end
 
+function is_solid(p,inc_semi)
 	for b in all(blocks) do
 		if b.colide != false then
 			local x,w,h=p.x,
@@ -1333,6 +1261,10 @@ function load_level(level, x, y, dx, dy)
 		0x1000+128*level.chunk,
 		128*64
 	)
+	for i,v in ipairs(level)do
+			level[i]=preload(v)
+	end
+	
 	if level.chunk then
 		_addr = level.chunk<32 and 
 										0x2000+128*level.chunk
