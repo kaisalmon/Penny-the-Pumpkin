@@ -2,6 +2,7 @@ pico-8 cartridge // http://www.pico-8.com
 version 36
 __lua__
 --penny the pumpkin
+max_coins=8
 function init()
 t=0
 wipe_progress = -1  -- -1: no transition, 0-128: transition in progress
