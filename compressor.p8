@@ -24,6 +24,10 @@ button_down=false
        
 function _draw()
 	cls()
+	if error then
+		color(8)
+		print(error)
+	end
 	color(7)
 	if stage == 1 then
 		for i,v in ipairs(keys) do
@@ -47,6 +51,8 @@ function _draw()
 	if stage == 3 then
 		camera(x,y)
 		map()
+		camera()
+		print((size/128).." rows")
 	end
 end
 
@@ -87,8 +93,10 @@ function _update()
 	end
 
 	if stage == 3 then
-		if(btnp(0))y+=5
-		if(btnp(1))y-=5
+		if(btn(0))x-=5
+		if(btn(1))x+=5
+		if(btn(2))y-=5
+		if(btn(3))y+=5
 	end
 end
 -->8
@@ -402,13 +410,17 @@ compress_from_playarea(selected_key)
 		'blob.p8')
 		
 
-	px9_comp(0,src_offset,128,16,
+	size = px9_comp(0,src_offset,128,16,
 	        	_dest, 
 	        	mget)
-	
-	cstore(_dest, _dest, 128*_chunk_size, "blob.p8")
-	cstore(_dest, _dest, 128*_chunk_size)
-
+	if size > 128*5 then
+		error = ("error too big:"..(size/128).." rows")
+		stage=1
+	else
+		
+		cstore(_dest, _dest, 128*_chunk_size, "blob.p8")
+		cstore(_dest, _dest, 128*_chunk_size)
+	end
 end
 
 function decompress_to_playarea(selected_key, use_backup)
@@ -712,7 +724,7 @@ fffff87fd3afff74806aa3f48173066041e386876ee1c4c48b8a9d5fcd4286cd81bb811b77399d9f
 68ffd8ff0ff53fc77d79d77ff5fdd32570fdd3ff02b8fdeffe1edfa5ffc5ff8d78fe3ff27fe4ffa757ff2ffe69ff803aaeb4bff90c64ff9a7fdfcf16ffe4ffce72e3ff471f85727e53ff03f99fbffa7ea9f389ffa7ff577648bf97feb9f9cffc0fc1c7eb1ffa1a6fe9d1f91fd446e3dfd9c4feffbfc67fecd669e6ffd9ffaffe
 04ce5fed3a9d3bdff85fc3f8df97fe63ff157fedffdd27fefba5b25bb75e7fe57a7b39ffc950702bb9df0ffc364fda7d3fb29a7ff092fff112df27f135fbe988fc3f24e563a1cb0aa967e6bfd3f2e4a54fc57f12a71c6ffc9538bffca4fb71ffcc4e18ef9ebafca4bfbcfc9affe0689fd1f912bff2849ffd3ffaa2713f3ffe7f
 09f87327ff29fd9a74efbeff0fc3aebb3871c497f134e5f93fed3c76fe7b9f9fe493ff0a7e724f14fdfaf5c3fdf1edffedffdbffb74ffed63f5c7e57ecfc73ff9d92c9a573209c92399fe7ff793f339fb9fc206736d92f79dfe3ff88879e47e2dfd5316cffc3ff9a3ff9fe79f56791fb57127dc4dff97f6ffc91d9f87fe27f6f
-fcbcc2cfdec1caefe52d576bd43e451757ab2490fe78f8e16fff8bffe3f0ebffcfe5ff97ffd3f8bac892047b81eefdbfdd3a937e17cfbf0b7fdffd1fed707522787afd17ffd5bc6fb9cfcd3de3f1fce7eff8f69c73f97e3f9f9e4ffd37cbc475f1f8a69df2839ffd7ff93ff2ffe8fd38fcd388727c9c809c8021212121212121
+fcbcc2cfdec1caefe52d576bd43e451757ab2490fe78f8e16fff8bffe3f0ebffcfe5ff97ffd3f8bac892047b81eefdbfdd3a937e17cfbf0b7fdffd1fed707522787afd17ffd5bc6fb9cfcd3de3f1fce7eff8f69c73f97e3f9f9e4ffd37cbc475f1f8a69df2839ffd7ff93ff2ffe8fd38fcd388727c9c807e1003ddfcffe2d253
 fffff87fd3affd148060c3168a3a11315e6ee1c9e0cfb9e3a906055c9cb842874d7356d73efe124adb8e3993aeaeb6ee9b5efc9fb4f5307d38e36e3cf38fdaef3c93adfbaf33de5befc3f1e8c0e4e64ab3ae9c571afecfc3f6bcc49dfe305ea51e4d93bf2c4fdc4fc9ca64fc48fccfcfff1cfd1dcaef8599dccb3f07f659faab
 f6e38e2f24211c7ff3e164be32750b68e4fe27effc49c375f9fe9fabaeab4e138b1bff9d1f853ab565de71c725fe1d44e961c567fe42e6edf883feafe7fafe640f50830b0fcbafeffc9fefbff5e129fabf6fcac9c0f27e2ff0e79ffc1dfbff4d523d4a1dcfd5a7fe14d3fde9d3be649eb8fcd7ebc1fd4d64ffc4afc2cbcc863f
 56486ebace53977c4893949fb24a922488812383fc38dcf52412967109ccaf4b059cb5dfb7eb27eb87fe99ba493ff159637ebf8ce0147e53ff1b8e778e090d0b1dafb67fe83fedf8b77089c9facff39e119c645b274e4f9fbffe49f8fe9e5fca49249e5fc93abec7fcc32713f249f924e9f4fc3713e43c954ffc77ff2f1d126e
