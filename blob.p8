@@ -4,7 +4,7 @@ __lua__
 --penny the pumpkin
 title_y=8
 
-max_coins=13
+max_coins=12
 function init()
 t=0
 wipe_progress = -1  -- -1: no transition, 0-128: transition in progress
@@ -310,8 +310,8 @@ function _update60()
 end
 
 function update_coin(c)
-	 if player.x+player.w>c.x-8
-		and player.x-player.w<c.x+8
+	 if player.x+player.w/2>c.x-8
+		and player.x-player.w/2<c.x+8
 		and player.h.y>c.y-16
 		and player.h.y<c.y then
 			del(coins,c)
@@ -320,7 +320,7 @@ function update_coin(c)
 			sr_coins[c.id]=true
 			coins_collected+=1
 			coin_at=time()
-			set_checkpoint(blocks,player.x,player.y-5,0,0)
+			set_checkpoint(blocks,c.x,c.y-5,0,0)
 
 			for i = 0,15 do
 				add_dust(c,rnd(),1,true,55,"coin")
@@ -1671,7 +1671,7 @@ end
 -->8
 --init
 function _init()
-	cartdata("kai-pumkinv1")
+	cartdata("kai-pumkinv1-1")
 	coins_collected=0
 	init()
 	for i = 0,30 do
