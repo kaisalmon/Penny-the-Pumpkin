@@ -77,13 +77,10 @@ function _update()
 		if(button_press)then
 			stage+=1
 			if selected_action == 1 then
-				compress_from_playarea(selected_key)
+				compress_to_game(selected_key)
 			end
 			if selected_action ==2 then
-				decompress_to_playarea(selected_key)
-			end
-			if selected_action ==3 then
-				decompress_to_playarea(selected_key, true)
+				decompress_to_level_file(selected_key)
 			end
 			sfx(0)
 		end
@@ -400,13 +397,14 @@ _level_dests={
 }
 
 function
-compress_from_playarea(selected_key)
+compress_to_game(selected_key)
+    cart="penny.p8"
+    local levelcart = keys[selected_key]..".p8"
 	src_offset=3
 	_dest=_level_dests[selected_key]
 	reload(_map+src_offset*128,
 	 _map+src_offset*128,
-	 16*128, 
-		'blob.p8')
+	 16*128, levelcart)
 		
 
 	size = px9_comp(0,src_offset,128,16,
@@ -417,12 +415,11 @@ compress_from_playarea(selected_key)
 		stage=1
 	else
 		
-		cstore(_dest, _dest, 128*_chunk_size, "blob.p8")
-		cstore(_dest, _dest, 128*_chunk_size)
+		cstore(_dest, _dest, 128*_chunk_size, cart)
 	end
 end
 
-function decompress_to_playarea(selected_key)
+function decompress_to_level_file(selected_key)
 
 	dst_offset=3
 	_src=_level_dests[selected_key]
