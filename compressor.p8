@@ -2,15 +2,33 @@ pico-8 cartridge // http://www.pico-8.com
 version 42
 __lua__
 --menu
+_sprites=0x0
+_sprites_end=0x0fff
+_sprites_len=_sprites_end-_sprites
+_map=0x2000
+_map_end=0x2fff
+_map_len=_map_end-_map
+
+_lower_map=0x1000
+
+_chunk_size=6
+
 x,y=0,0
 
 keys={
 	"forest",
 	"tunnels",
 	"village",
-	"mountain",
 	"treetops",
 } 
+
+_level_dests={
+	_map+128*(3+6*0), --Forest
+	_map+128*(3+6*1), --Tunnels
+	_map+128*(3+6*2), --Village
+	_map+128*(3+6*3), -- Treetops
+    --_lower_map, -- Lots more space!
+}
 actions = {
 	"compress to game",
 	"decompress to level file",
@@ -377,45 +395,25 @@ function
 end
 -->8
 --save/load
-_sprites=0x0
-_sprites_end=0x0fff
-_sprites_len=_sprites_end-_sprites
-_map=0x2000
-_map_end=0x2fff
-_map_len=_map_end-_map
 
-_lower_map=0x1000
 
-_chunk_size=5
 
-_level_dests={
-	_map+128*19,
-	_map+128*24,
-	_lower_map,
-	_lower_map+128*5,
-	_lower_map+128*10,
-}
-
-function
-compress_to_game(selected_key)
+function compress_to_game(selected_key)
     cart="penny.p8"
     local levelcart = keys[selected_key]..".p8"
-	src_offset=3
+	local header_height=3 -- The top 3 lines of the map never change
 	_dest=_level_dests[selected_key]
-	reload(_map+src_offset*128,
-	 _map+src_offset*128,
-	 16*128, levelcart)
-		
-
-	size = px9_comp(0,src_offset,128,16,
-	        	_dest, 
-	        	mget)
-	if size > 128*5 then
+	
+    local bytes_to_copy =  0x30ff - 0x0000
+    reload(0x0000, 0x0000, bytes_to_copy, levelcart) -- Reload all data on the level disk
+	local working_addr = 0x8000	
+	size = px9_comp(0,header_height,128,16,working_addr, mget)
+	if size > 128*_chunk_size then
 		error = ("error too big:"..(size/128).." rows")
 		stage=1
 	else
 		
-		cstore(_dest, _dest, 128*_chunk_size, cart)
+	cstore(_dest, working_addr, 128*_chunk_size, cart)
 	end
 end
 
