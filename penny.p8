@@ -1504,6 +1504,10 @@ level8={
 		s[3]=0
 	end},
 }
+local stars = {}
+for i=0,30 do
+	add(stars,{rnd(256)-30,-50-rnd(85)})
+end
 level1_variant={
 	px=20,
 	py=100,
@@ -1512,9 +1516,17 @@ level1_variant={
 	c={
 		{x=17,y=2.75,id=1}
 	},
+	{"41,0,3,3,10,-30",  draw=function()
+
+		-- Draw stars
+		for i=1,#stars do
+			pset(stars[i][1],stars[i][2],7)
+		end
+		ovalfill(60,-100,90,-70,7)
+		ovalfill(70,-100,100,-70,1)
+	end},
 	{"51,0,5,3,-4,-7", colide=false, rx=9},
 	{"51,0,36,4,-4,-4", colide=false,fill=3},
-	"41,0,3,3,10,-10",
 	"0,3,1,3,0,-3",
 	{"9,0,5,19,-5,-3", colide=false,fill=5},
 	{"9,0,5,3,-4,-6", tile=true},
@@ -1637,6 +1649,8 @@ function draw_blocks(front)
 						b[1]+i/8,b[2],
 						0,1/8)
 				end
+			elseif b.draw then
+				b.draw()
 			elseif b.fill then
 				rectfill(
 					b[5]*8,
