@@ -20,6 +20,7 @@ keys={
 	"tunnels",
 	"village",
 	"treetops",
+	"graveyard",
 } 
 
 _level_dests={
@@ -27,6 +28,8 @@ _level_dests={
 	_map+128*(3+6*1), --Tunnels
 	_map+128*(3+6*2), --Village
 	_map+128*(3+6*3), -- Treetops
+	_lower_map, -- graveyard
+
     --_lower_map, -- Lots more space!
 }
 actions = {
@@ -427,7 +430,14 @@ function decompress_to_level_file(selected_key)
     copy_sprites(cart, levelcart)
 	reload(_src, _src, 128*_chunk_size, cart)
 
-	px9_decomp(0,dst_offset,_src,mget,mset)
+    local _addr = _src
+    local working_ram_addr = 0x8000
+    memcpy(
+        working_ram_addr,
+        _addr, --The address of where the compressed data for the level is
+        128*_chunk_size -- how many rows to copy
+    )
+    px9_decomp(0,3,working_ram_addr,mget,mset)
 	cstore(_map+128*dst_offset, _map+128*dst_offset, 128*16, levelcart)
 end
 
