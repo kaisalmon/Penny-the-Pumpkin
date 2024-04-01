@@ -5,7 +5,7 @@ __lua__
 title_y=8
 label=false
 
-max_coins=12
+max_coins=13
 function init()
 t=0
 broken_blocks={}
@@ -397,6 +397,9 @@ function update_enemy(e)
     local r=rnd()
     e.dir=r<0.33 and -1 or r<0.66
      and 1 or (not e.pumpkin and player.x-e.x or 0)
+				if e.dir==0 and (e.maxy and e.y>e.maxy) or (e.miny and e.y<e.miny)  then
+					e.dir = rnd({1,-1})
+				end
   end
   if e.maxx and e.x>e.maxx then e.dir=-1
   elseif e.minx and e.x<e.minx then e.dir=1 end
@@ -681,18 +684,19 @@ function skw_spr(x,y,hx,hy, w, size, u, fx)
 end
 
 function on_land(p)
-		if(p.dy > 2) then
-	 	if will_smash(p) then
-	 		shake=25
-	 		sfx(2)
-	 		if p.block.on_crash then
-	 			p.block:on_crash()
-	 		end
-			else
-	 		sfx(1)
-	 	end
-			for i=0,20 do add_dust(p,2,2) end
+	if(p.dy > 2) then
+		for i=0,20 do add_dust(p,2,2) end
+		if will_smash(p) then
+			shake=25
+			sfx(2)
+			if p.block.on_crash then
+				p.block:on_crash()
+				return true
+			end
+		else
+			sfx(1)
 		end
+	end
 end
 
 function die()
@@ -758,7 +762,6 @@ function check_for_squeeze(p)
 				p.h.y -= 1
 			end
 		elseif right_col then
-		debug=(debug or 0)+1
 			p.x -= 1
 			p.h.x -= 1
 		elseif left_col then
@@ -850,9 +853,6 @@ function update_particle(p, inc_semi)
 		if p.dy > -.1 then
 			p.block = y_col
 		end
-		if p.on_land  then
-			p.on_land(p)
-		end
 		if fget(tile, 7) and not fget(tile, 1) then 
 			if p==player  then
 				die()
@@ -863,8 +863,13 @@ function update_particle(p, inc_semi)
 				die()
 			end
 		end
-		p.dy *= -1
-		p.dy *= p.bounce or 0
+		local override_bounce = false
+		if p.on_land  then
+			override_bounce = p.on_land(p)
+		end
+		if not override_bounce then
+			p.dy *= -(p.bounce or 0)
+		end
 	end
 end
 -->8
@@ -1053,6 +1058,9 @@ local crash_breakable =  function(b)
 	for i = 0,15 do
 		add_dust({x=player.x,y=player.y-16,w=player.w},0,0,true,55,"coin")
 	end
+	local x = -5
+	player.dy=x
+	player.h.dy=x
 	sfx(7)
 end
 drop = function(b)
@@ -1292,11 +1300,12 @@ level4={
 		{x=4, y=23, id=7},
 		{x=352/8, y=120/8, id=8},
 		{x=23, y=3.5, id=9},
+		{x=39, y=27, id=13},
 	},
 	e={
 		{x=352/8, y=120/8, 
 		pumpkin=true, 
-		minx=352,maxx=352,
+		minx=317,maxx=370,
 		miny=125, maxy=175},
 		{x=91/8, y=61/8, 
 		pumpkin=true, 
@@ -1336,7 +1345,7 @@ level4={
 		"40,6,4,7,42,12",
 		front=true
 	},
-	{"27,0,2,2,38,25",on_crash=crash_breakable, key="level4"},
+	{"27,0,2,2,38,25",on_crash=crash_breakable,front=true, key="level4"},
 }
 
 level5={
@@ -2194,11 +2203,11 @@ f3b2acffc4e61fc9c0834eab95d6bbe2449c24fc5254912444091c3f24e1fb5ffc7ff8fff1f578e2
 4f9fb733d43c954ffc77ff3f1d1239257229f9c378e5c379ecaffd0389ffa5e2f0f24ed27a93d575ddebff3d9090909090ede4b2218fd219200df84df8f934962fe30eedffc0ffc0de153f391fa48d0f52c11bfc71ff88fc0fccfff1ffd1ffc7f28ffee7f3371792b8904e091ccff7ff2c9fb1cfbf87e1032fe0fc394e1ec9f9
 41d398fd9bf1918b3ffcd90fca8e9f81fa5dc7e6ffc046ffc5fb7fe2a1cf1fcbfa6e6162c271fb7edfca5842c7f5880f5ffe49d6d3d4907e43d3ddf97bcce1ffecffcdf875fff3f2ffc7fff5fc5d6449288fcb909dcffbfff10424bb938bf7e1f8dbfeffeaffac9f82ffe98f8f2efffb7ab9f8a1e2d4f78fcbf57edf90e64fd7
 4d5bfbfffcf32087fb090fedb99ecbd3ff67fe7ffd1ffa7f6eff36a21ede9df09c80c27209c8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-fffff87fd3bfffe10028a9028c2b2caba323a40c8ba830b8b934ac7170a222b3038404bbbc3b312ab024a5259e1eada020a12a2d2fa7938b0a94bca7719312942e1b9c1afff53b929bcef8e7aefcf7ef9c7e1e14b25a96c9f8bf98fc627ffa3bdf97e7fa75e5fcbf5fca71fb7dfbff1f9709e3f2ffd723ff84fe7f36feafe9fd
-9ef93fcff4ff6bfd3fe10ff21e1dbff070ffc09ff867fe39f87e09f858ffc526ffc737cfcafd3f474fd3924ffc5ff813ff0731ff93f29cce4f0d3f1fe8fca4e79fa737f24e5f03f797ff2effc70f0eb49ff7fd5ff8327e724fa27e087271a7fe620821dcb64b667fe69f9a7fe7ffd14c5d3ff4ffea9c9f9a53989d94ed3f07ef
-dbf6f67f7a4d2d1c0e1bf9ffd61c4ffd9ffb4ffddfeca8750e01c4ffc5ff8ecffc97f2bffbfff73f63f381ffc2c96eb7ff3fe4bf97fee6b6cfc271c1ff8ff089f94ffe23ff97eae7f7a398713ff49373c493a5fe0fc93f2e7ff9fff4ffe4ffebffdbf3d2ffe04bc227fe0927ecd002c3a24fcc918b17c3f1cffc7f87ff787272
-9df1ff8efff5ffc5bf08921fe2f047fad6763cc9c57eefc27fe7f4ffce5b3bc9f97ff8f1389ff8dfe4245e5dfc95ff27ff98bffea7ffb1e9e293ebc7e529cc9fc93ebff8ff8ebbdcdfebfe93c55fc670ffd139fff9ec9096de7ff04bfd4ee08ffc5c84fc027e16087e3cebffc3ff721bf3dfff7fff7fff03ffeb8efbf6c9163c
-37801373f87fefffdb487fb0cfffe0c2f3ecfdefffcdea54b1f8c3c9fe7f89fe54ff3f038821c30f300391ff9e49aff1fe7f1591ffda94e13b87fe57d4e8123dffd50e4a27e2fc40f1fcaffc34e8123affd50e4a27e2fc40f10424bb938bf7e1f8dbfeffeaffac9f82ffe98f8f2efffb7ab9f8a1e2d4f78fcbf57edf90e64fd7
+fffff87fd3bfffe20028a9028c2b2caba323a40c8ba830b8b934ac7170a222b3038404bbbc3b312ab024a5259e1eada020a12a2d2fa7bebf938b0a94bca7719312942e1b9c1afff53b929bcef8e7aefcf7ef9c7e1e14b25a96c9f8bf98fc627ffa3bdf97e7fa75e5fcbf5fca71fb7dfbff1f9709e3f2ffd723ff84fe7f36feaf
+e9fd9ef93fcff4ff6bfd3fe10ff21e1dbff070ffc09ff867fe39f87e09f858ffc526ffc737cfcafd3f474fd3924ffc5ff813ff0731ff93f29cce4f0d3f1fe8fca4e79fa737f24e5f03f797ff2effc70f0eb49ff7fd5ff8327e724fa27e087271a7fe620821dcb64b667fe69f9a7fe7ffd14c5d3ff4ffea9c9f9a53989d94ed3f
+07efdbf6f67f7a4d2d1c0e1bf9ffd61c4ffd9ffb4ffddfeca8750e01c4ffc5ff8ecffc97f2bffbfff73f63f381ffc2c96eb7ff3fe4bf97fee6b6cfc271c1ff8ff089f94ffe23ff97eae7f7a398713ff49373c493a5fe0b3ff9a4ffe8e13f2e7ffafff6ffe4ffefffe3f3d6ffe14bca27fe0927ecd002c3a24fd0918b17c3f1cf
+fc7ffcfffcc9e38393be3ff1dffefff8b7e11643fc4e08ff5acec79938afddf84ffcfe9ff9cb67793f2fff5e2713ff1bfc848bcbbf92bfe4fff717ffe4fffa3d3c527d78fca53993f927d7ff1ff1d77b8bfd7fd278abf8ce1ffa273fffbd9212dbcffe097fa9dc11ff8b9087ff4f427e16087e3cebffc7ff721bf3dfffc0fffe
+0ffff0bfff80e3befdb2458f0de004dcfe1ffbfff6d10ff619fffc385e7d9fcdfffdbd4a963f18793fcff13fca9fe7e071043861e600723ff3c935fe3fcfe2b23ffc529c2770ffcafa9d0247bffaa1c944fc5f8827e2fc40f10424bb938bf7e1f8dbfeffeaffac9f82ffe98f8f2efffb7ab9f8a1e2d4f78fcbf57edf90e64fd7
 4d5bfbfffcf32087fb090fedb99ecbd3ff67fe7ffd1ffa7f6eff36a21ede9df09c80c27209c8000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 fffff87fd3bfffe43c003b292870bef13f038404f83b930c2f8a94b022bfa8b78ba78c93940b3536b7363d35b3b42323a4313e3daf2b2ba4ac272cb48e860e2e0687082525a626adad2e8fc647fffd57f26ffffb27e49370e5774871de95ffff3d7cf7d75f7e1c79f8fe3f8a73cb72e78ffff974fcbf3fd3f5fdba77fbff1fcf
 f5fdff889feffdffff3e7ff07fe1ffc5face2f3fa7e9fa7e9dc5f3f2fc7fffc8ffc7f929e4397e9a4fd7fffc8f25ffc9ff965b24fcd3fffd5d7fe6ffcfffa3ff4ffea9092c93f173f8cffd7ffb24ffdb7fffadcffeeffdf3ff87e1f878fdff04ee7ff1383ff97ff3ffe87ff5fffebcffece5f860ffedfadffd1ffa61f6bf7ff7
