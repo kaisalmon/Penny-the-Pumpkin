@@ -14,7 +14,6 @@ fc=0
 dust={}
 moved=false
 shake=0
-trail={}
 player = {
 	on_land=on_land,
 	x=0,
@@ -41,7 +40,6 @@ cam_x = player.x-64
 cam_y = player.y-64
 died_at=nil
 revived_at=nil
-fire_at=nil
 local level=dget(63)
 load_level_instant(
 	levels[level] or level1,
@@ -72,10 +70,7 @@ function reset_pal()
 	pal()
 	palt(0,false)
 	palt(1,true)
-	pal(blocks.pal or {1,2,3,4,
-						5,6,7,8,
-						9,10,11,12,
-						13,14,15,16}, 1)
+	pal(blocks.pal, 1)
 end
 
 function draw_player(x,y)
@@ -178,14 +173,6 @@ function _draw()
 
 	if debug then
 		cursor(1,1)
-		print(tostr(player.x)..", "..tostr(player.y),7)
-		print(stat(7).."fps",7)
-		print(flr((stat(0)/20)).."% mem",7)
-		print(flr(update_cpu_usage*100).."% cpu (update)")
-		print(flr((draw_cpu_usage)*100).."% cpu (draw)",7)
-		if(profile_cpu_usage !=0)		print((flr(profile_cpu_usage*1000)/10).."% cpu (profile)",7)
-	
-		print(flr((stat(1))*100).."% cpu (total)",7)
 		print(debug)
 	end
 	
@@ -229,15 +216,9 @@ function _draw()
 	--values 0x10 and 0x30 to 0x3f change the effect
  poke(0x5f5f,0x10)
 --new colors on the affected line
- pal(blocks.pal == night and {
- 0,0,0,132,
-						0,0,0,0,
-						137,9,0,0,
-						13,0,0
- } or {131,130,131,132,
-						133,5,6,136,
-						137,9,11,12,
-						13,-4,15},2)
+ pal(blocks.pal == tunnel and 
+ split("0,0,0,132,0,0,0,0,137,9,0,0,13,0,0")
+  or split("131,130,131,132,133,5,6,136,137,9,11,12,13,-4,15"),2)
 --0x5f70 to 0x5f7f are the 16 sections of the screen
 --0xff is the bitfield of which of the 16 line of the section are affected
  pal_memset(0x5f70,0,16)
@@ -618,36 +599,14 @@ function update_player()
 		die()
 	end
 
-	if player.tile == 35 then
-		fire()
-	end
-
-	 
 	if player.gnded and abs(player.dx) > 0.4 then
 		if(rnd()<.3)add_dust(player)
 	end
-
 	
 	if player.y > 2000 then
 		die()
 	end
 end
-
--- function add_dust(ch, dy, dx,fullh, t)
--- 	if(#dust > 100 or stat(7)<60) then
--- 		deli(dust, 1)
--- 	end
--- 	add(dust, {
--- 			x=ch.x
--- 				+(rnd()-.5)*ch.w,
--- 			y=ch.y - (fullh and rnd()*20 or 0) ,
--- 			c=11,
--- 			dx=(dx or 1)*(rnd()-.5)-.1*ch.dx,
--- 			dy=2*(dy or -.7)*(rnd()*.5+.5),
--- 			t=(t or 30)+flr(30*rnd()),
--- 			bounce=.7
--- 		})
--- end
 
 function update_character_w(ch)
 	local h = ch.y-ch.h.y
@@ -659,26 +618,17 @@ function update_character_w(ch)
 	ch.h.w = ch.w
 end
 
-function skw_spr(x,y,hx,hy, w, size, u, fx)
-
+function skw_spr(x,y,hx,hy, w, size, u)
 	h = y-hy+1
 	if (h<0)h=0
-	
 	for i=0,h do
 		s = i/h*16
 		sw= (hx-x)*(h-i)/h
 		local  v, dv = s/8, 1/w*2
-		if fx then
-			tline(x+w/2 + sw,y+i-h,
-								x-w/2 + sw,y+i-h,
+		tline(x-w/2 + sw,y+i-h,
+								x+w/2 + sw,y+i-h,
 								u, v,
-							 dv)
-		else
-			tline(x-w/2 + sw,y+i-h,
-									x+w/2 + sw,y+i-h,
-									u, v,
-								 dv)
-		end
+								dv)
 	end
 
 end
@@ -710,19 +660,6 @@ function die()
 		add_dust(player, player.dx,player.dy,true,55)
 	end
 end
-
-function fire()
-	sfx(3)
-	
-	if fire_at and fire_at > time()-1 then
-		die()
-	else
-		player.dy -= 5
-		player.h.dy -= 8
-		fire_at=time()
-	end
-end
-
 -->8
 --physics
 function check_for_squeeze(p)
@@ -1088,19 +1025,10 @@ drop = function(b)
 	end
 end
 
-night={0,-16,-4,1,
-						0,5,6,8,
-						-3,-1,12,12,
-						1,14,15}
-forest_pal={138,2,3,4,
-						147,6,7,8,
-						9,10,11,12,
-						13,-4,15}
-spooky_pal = {128,130,131,132,
-133,5,6,136,
-137,9,3,12,
-13,8,15}
-day={-4,2,3,4,5,6,7,8,9,10,11,12,13,14,15}
+tunnel=split("0,-16,-4,1,0,5,6,8,-3,-1,12,12,	1,14,15")
+forest_pal=split("138,2,3,4,147,6,7,8,9,10,11,12,13,-4,15")
+spooky_pal = split("128,130,131,132,133,5,6,136,137,9,3,12,13,8,15")
+day=split("-4,2,3,4,5,6,7,8,9,10,11,12,13,14,15")
 
 level1={
 	px=20,
@@ -1227,7 +1155,7 @@ level2={
 level3={
 	px=16,
 	py=-16,
-	pal=night,	
+	pal=tunnel,	
 	chunk=3+chunk_size,
 	c={
 		{x=2.5,y=4,id=4},
@@ -1495,7 +1423,6 @@ level7 = {
 	"16,5,6,5,24,-7",
 	"24,5,5,6,32,0",
 }
-delete_me=0
 level8={
 	px=17,
 	py=17,
@@ -1577,10 +1504,6 @@ function is_solid(p,inc_semi)
 			and x/8 < b[5]+w
 			then
 				local y=p.y
-				if b[7] then
-					y -= b[7](p.x,t,b)
-				end
-				
 				if y/8 > b[6]
 				and y/8 < b[6]+h
 				then
@@ -1646,16 +1569,7 @@ function draw_blocks(front)
 	if(b.front == front) then
 	for ox=0,(b.rx or 1)-1 do --horizontal repeats 		
 		for oy=0,(b.ry or 1)-1 do --vertical repeats
-			if b[7] then
-				for i=0,b[3]*8-1 do
-					local x=b[5]*8+i
-					y1=b[6]*8+b[7](x,t,b)
-					y2=(b[6]+b[4])*8+b[7](x,t,b)-1
-					tline(x,y1,x,y2,
-						b[1]+i/8,b[2],
-						0,1/8)
-				end
-			elseif b.draw then
+			if b.draw then
 				b.draw()
 			elseif b.fill then
 				rectfill(
@@ -1818,7 +1732,6 @@ function load_level_instant(level,x,y,dx,dy)
 	if #coins == 0 then
 		coin_at=time()
 	end
-	set_halloween_map()
 end
 
 
@@ -1940,10 +1853,6 @@ function is_halloween()
     local day = stat(92)
     return (month == 10 and day >= 25) or
            (month == 11 and day <= 7)
-end
-
-function set_halloween_map()
-
 end
 __gfx__
 000000001111000000001111111110000001111144499444005555605000000000000000000000051113333333333311111111115353333333333b3b00000000
