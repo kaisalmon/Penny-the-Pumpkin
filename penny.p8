@@ -169,7 +169,6 @@ function _draw()
 	draw_blocks(true)	
 	camera()
 	draw_wipe_transition(wipe_progress)
-	if(blocks==level3 or blocks==level8)	draw_wipe_transition(.35)
 	local draw_cpu_usage = stat(1) - stat_1
 
 	if debug then
@@ -1234,7 +1233,10 @@ level3={
 		update=drop
 	},
 		"27,13,16,6,58,5",
-	"58,3,50,16,74,0"	
+	"58,3,50,16,74,0",
+	{"0,0,0,0,0,0", front=true, draw=function()
+		draw_dark_halo(max(50, lerp(50, 100, (player.x-750)/250)))
+	end}
 }
 
 level4={
@@ -1444,12 +1446,27 @@ function draw_light(x,y,c,r)
 	ovalfill(x-r,y-r,x+r,y+r,c)
 	fillp(0)
 end
+function draw_dark_halo(half_radius)
+	ovalfill(
+		player.x-half_radius,
+		player.y-half_radius,
+		player.x+half_radius,
+		player.y+half_radius,0| 0x1800)
+	half_radius-=10
+	fillp(▒)	
+	ovalfill(
+		player.x-half_radius,
+		player.y-half_radius,
+		player.x+half_radius,
+		player.y+half_radius,0| 0x1800)
+	fillp(0)
+end
 level8={
 	px=17,
 	py=17,
 	pal=spooky_pal,
 	c={
-		{x=16,y=3.5,id=14},
+		{x=16,y=2.5,id=14},
 	},
 	chunk=32+chunk_size*0,
 	{"0,0,0,25.5,0,0", draw=function ()
@@ -1462,7 +1479,7 @@ level8={
 	end, update=function()
 		if player.x > 245 then
 			load_level(level3,35,87)
-		elseif player.y < -4 then
+		elseif player.y < -4 and player.x < 100 then
 			load_level(level9,138,230,-2,-7)
 		end
 		
@@ -1473,6 +1490,9 @@ level8={
 	"0,3,28,16,0,0",
 	"28,3,27,8,2,16",
 	{"27,0,2,2,20,20",on_crash=crash_breakable, key="level8"},
+	{"0,0,0,0,0,0", draw=function()
+		draw_dark_halo(lerp(100,25,player.y/250))
+	end}
 }
 level9={
 	px=17,
@@ -2007,17 +2027,17 @@ __gfx__
 00000dd00dd0ddd50ddd00600d655670000ddd00dd0d0d700d65565556555555555556704444444411111111111111111111111133313331113131315dd55555
 5000000000000000000000050d65556050000000000000050055555555555555d555556045544554111111111111111111111111133133113131333355555555
 ffff8ff73dfbff7e920003228a2a031b308273aa021ac0c83048408b53b2b2ca334b637bb3b3cee3cefbf3ffb0fe6353cbcbd377e3d33bd67a92b9c9c932324a
-f64a0aa27fa9eeeee005051d7085859db056bd17fcc5ab6e5ffde997e99c7f1e87cff7f2fc4fdf756ffd6afbfb9e8f95aff7e0fbf9bebffb7ebfd2fffb0fe4f2
-eff1cff579d9ff3eff9cf32ffb3f94ff599f1a72eff46dfecfcff78e3e37ffe8f31fff3e98f31f7f7ceff6cffb9ff74f39fff1efe183cf83bd329f77ff78ff75
-eff1dff78ffb1ff7ce29b5ccefd7f8dfdbf5cff58f9b3dff47b8ffa8fff7af71f75effbcdcf8bebdf98fa748fb9ffb1ff39090f37ff9cff0ef23ff2f7b7cef66
-dfff0ffff14ff97fff93fbf0cffb48fa6efdcf29ff8ef7921ec3e1a8831b812e749ba3f2f1dff38f61948fcf9ac3fcef3bfbeffbdf15fff9cfffbc39ff40ff3c
-ffbbc9ff9cffadabfffeff3efffbfff9fff1ef76c144a3aea046f5ff22a43bff76eff22cfffd4f2ebc56ffdeff3a1fc94affcc36ffc1ecf18ff7354d7bff73ef
-74130e77ffbefffdfffbfff7efffdfffbfd87403383bfff2eff9dff59ff1594a41ff38ffa274ef89f19f3d99fdf1bffbf97eff7eefd680a7d0f3f7ef3aff55f7
-eef735784e12718993ffdcff7fff37ff2fd9834e387aeff9dff9bff370e2721ecfffff30ff8f42ff1a51d73d4f19a7e7d1e7f3f83e87c9ff9ef32f73eff3cff7
-8f21374c74f1ff2cf6cfeac507c92a9476eff6df23f39f948fe7f18f76d5faef96aff1af399caf317ad1ff0eff9cff58bcff119648fb9f3eff93ff2af9eb2d10
-78ff901c83a7e6f7d7ff79fff1e2e5f958e761f5fb99e16eea72ff0fc2f30f7d71b8f75f0f44ae8fe5f71f07d9f48d6fd6318f0787f33f7a31ffd3f32fe7f4ff
-1e9e9de07eff1fe19b3bffd33ff79eff1dff3af9fc722cffde93459edc7edf350ffb9ffbffa8cf265a5a3b68f3e2f1bff334ff4371e89a2605277aefd3f3ffd8
-e39eff7cf7fff1ff9ff1ff9c8deff82c5ffd57f33f953c5f37943cff9fc5ef75defffaff9ff7ffccffeff651bc9c9b59dc78ff08000000000000000000000000
+f64a0aa27fa9eeeee005051d7085859db056bd17fcc5ab6e5ffde997e99c7f1e87cff7f2fc4fdf756ffd5af9fb8ee761e7f93cfa7eafeffe9fefbcf7fecf31b8
+ff78ff715e7ef78fff2ff4cffacf2df75ee78694ff395fbbfff3f1af83cdff3ef8cff78f2ef4cfd71fffb9fff2eff5df42ff7cff78d96c9df1bcfbcff3affb0f
+ffbeff5cffb8ff4629ed763fcef7deaeff2eff5cecf9bf4af5cf75bfff0dbbfff2efe5c6f7e5cdff3c4d52ffdcff988f8494ffcbff0ef71f79ff59ebf33f73fe
+ff788fff4afffb9fdc8ff75ecf52f763ff4e79ff349ff4900e4f155c887c21d39c1d87ff9eff0c2bf47c5e946ef75fd9ff5fffaef8cfff7eefc5f98f72eff1df
+cd7eeff4ef5d7dfff7fff1dfffcfff8fff3f832e127d053522ff9f2155f9bff31fe771efff7a61b5f2fff6dff1c85e72ef36f18f6e07ff3cafe95afb9ffb2f93
+f830fbfff5efffdfffbfff7ffffeffcda69348d1f99ff74fffaeff8ccfda027acff19f25f34f0cffecc9ec8fffddcffff3fff33f86340d96bfff5ff1afbaff37
+afc9f31280cb1cfceff6fffbbff9ff499e7c42d1f34fffceff9d8f9317f3f07eff8ff1ff1c72df80baeef94ab83d0fbe1fcff7b14c7eff94ff19fb1fff3eff0c
+39e92283ffef31f75e273e485e21b4f33ff79e19ffacf43c0fff3ca3def73ff40dff4de9f40dd983feff70eff4cfe2f58fb8c452fffcf19ffcdf41df6f09c0f3
+8fe4903c3d37bffecffb8f9f274fcfb20f2bdfcf8c7f5317f3ff1816ff688bcbb5fffa2872752c3fffb848aee77c3b86f93c381cffd983f99f9eff391ff7fff0
+989de07eff1fe19b3bffd33ff79eff1dff3af9fc722cffde93459e6c7edfff49cff2eff6ff2efb819a96c61ef8bc78effc0dffdc503eaa8549c1a5ff6cf71e3b
+ff8f3deef9cf77ff1fffff19ffcfd9f88ecff2d57f35ff53c9f374237178ff2f9bcffabdfff5ff2fffff99ffcfedb2793937b2b9f0ff00000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
