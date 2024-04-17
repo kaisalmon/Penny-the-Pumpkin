@@ -6,7 +6,7 @@ local chunk_size=6
 crash_breakable =  function(b)
 	b[3]=0
 	if b.key then
-		add(broken_blocks, b.key)
+		broken_blocks[b.key] = true
 	end
 	for i = 0,15 do
 		add_dust({x=player.x,y=player.y-16,w=player.w},0,0,true,55,"coin")
@@ -99,7 +99,7 @@ level2={
 		{x=33,y=17,id=2},
 		{x=22.5,y=11,id=3}
 	},
-	blocks="1:6,2:5,3:48,4:3,5:0,6:-3,update:level2_adj,fill:3,colide:false|1:115,2:18,3:6,4:1,5:35,6:16,colide:false|1:32,2:5,3:16,4:9,5:-0.5,6:0,colide:false,rx:4|1:32,2:12,3:16,4:1,5:-0.5,6:8,rx:4,ry:9,colide:false|1:18,2:0,3:48,4:3,5:0,6:16,colide:false,tile:true|1:18,2:0,3:48,4:13,5:0,6:19,colide:false,fill:4|1:48,2:3,3:16,4:16,5:0,6:0|1:32,2:14,3:5,4:4,5:6,6:6|1:64,2:3,3:48,4:16,5:0,6:16|1:112,2:3,3:16,4:16,5:32,6:0|1:0,2:60,3:10,4:4,5:25,6:12,front:true|1:1,2:63,3:1,4:1,5:16.5,6:15,colide:false,front:true|1:106,2:3,3:4,4:4,5:0,6:28,colide:false,front:true|1:31,2:18,3:1,4:1,5:31,6:14,front:true,rx:3,ry:3,colide:false|1:25,2:8,3:3,4:5,5:21,6:11|1:21,2:11,3:1,4:2,5:20,6:14|1:27,2:0,3:2,4:2,5:7,6:28,on_crash:crash_breakable,key:level2_breakable"
+	blocks="1:6,2:5,3:48,4:3,5:0,6:-3,update:level2_adj,fill:3,colide:false|1:115,2:18,3:6,4:1,5:35,6:16,colide:false|1:32,2:5,3:16,4:9,5:-0.5,6:0,colide:false,rx:4|1:32,2:12,3:16,4:1,5:-0.5,6:8,rx:4,ry:9,colide:false|1:18,2:0,3:48,4:3,5:0,6:16,colide:false,tile:true|1:18,2:0,3:48,4:13,5:0,6:19,colide:false,fill:4|1:48,2:3,3:16,4:16,5:0,6:0|1:32,2:14,3:5,4:4,5:6,6:6|1:64,2:3,3:48,4:16,5:0,6:16|1:112,2:3,3:16,4:16,5:32,6:0|1:0,2:60,3:10,4:4,5:25,6:12,front:true|1:1,2:63,3:1,4:1,5:16.5,6:15,colide:false,front:true|1:106,2:3,3:4,4:4,5:0,6:28,colide:false,front:true|1:31,2:18,3:1,4:1,5:31,6:14,front:true,rx:3,ry:3,colide:false|1:25,2:8,3:3,4:5,5:21,6:11|1:21,2:11,3:1,4:2,5:20,6:14|1:27,2:0,3:2,4:2,5:7,6:28,on_crash:crash_breakable,key:level2_breakable|1:37,2:14,3:7,4:4,5:28,6:12"
 }
 
 level3_draw = function ()
@@ -124,6 +124,9 @@ level3_adj = function()
                 end
             end
         end
+    end
+    if player.x < 850 and player.x > 250 then
+        player.y = max(2,player.y)
     end
     if player.x < -10 then
         load_level(level8, 196,183)
@@ -161,7 +164,11 @@ level4_adj = function()
     if player.y>264 then
         load_level(level3, 971, 0, 0, 0)
     elseif player.x < -3 then
-        load_level(level6,120,player.y-25)
+        if player.y < 150 then
+            load_level(level6,240,player.y-25)
+        else
+            load_level(level6,195,215)
+        end
     elseif player.x > 388 then
         load_level(level5, 0, player.y < 30 and 0 or 64)		
     end
@@ -190,7 +197,7 @@ level4={
 		minx=126,maxx=295,
 		miny=128, maxy=210}
 	},
-	blocks="1:35,2:0,3:6,4:3,5:4,6:5,update:level4_adj,rx:7,colide:false|1:35,2:0,3:44,4:14,5:4,6:8,colide:false,fill:6|1:85,2:7,3:3,4:6,5:25,6:20,rx:2|1:0,2:3,3:48,4:16,5:0,6:0|1:48,2:3,3:48,4:16,5:0,6:16|1:40,2:6,3:4,4:7,5:41,6:12,front:true|1:56,2:2,3:4,4:1,5:37,6:16,front:true|1:27,2:0,3:2,4:2,5:38,6:25,on_crash:crash_breakable,key:level4_breakable,front:true"
+	blocks="1:35,2:0,3:6,4:3,5:4,6:5,update:level4_adj,rx:7,colide:false|1:35,2:0,3:44,4:14,5:4,6:8,colide:false,fill:6|1:85,2:7,3:3,4:6,5:25,6:20,rx:2|1:0,2:3,3:48,4:16,5:0,6:0|1:48,2:3,3:48,4:16,5:0,6:16|1:40,2:6,3:4,4:7,5:41,6:12,front:true|1:56,2:2,3:4,4:1,5:37,6:16,front:true|1:27,2:0,3:2,4:2,5:38,6:25,on_crash:crash_breakable,key:level4_breakable,front:true|1:48,2:13,3:1,4:3,5:0,6:23,front:true,colide:false"
 }
 
 level5_adj = function()
@@ -223,9 +230,38 @@ level6_adj=function()
         else
             load_level(level2, 380, 32)
         end
-    elseif player.x > 130 then
+    elseif player.x > 258 then
         load_level(level4, 16, player.y+15)	
-    end	
+    end
+    if player.y > 125 then
+        manual_cam = true
+        if(not broken_blocks.level6_breakable)level6.pal=tunnel
+        cam_x = lerp(cam_x,73,0.2)
+        cam_y = lerp(cam_y,128,0.08)
+        if player.x > 205 then
+            load_level(level4,8,199)
+        elseif player.y > 280 then
+            load_level(level3,681,0)
+        end
+     else
+        manual_cam = false
+        level6.pal=forest_pal
+        cam_bounds[4]=0
+     end
+end
+level6_halo=function()
+    if not broken_blocks.level6_breakable and player.y > 125 then
+       draw_dark_halo(40)
+    end
+end
+level6_bg=function()
+   if broken_blocks.level6_breakable then
+       clip(0,128-cam_y,128,128)
+       rectfill(0,128,256,256,0)
+       draw_light(136,142,5,70)
+       draw_light(136,142,4,40)
+       clip()
+   end
 end
 level6 = {
 	pal=forest_pal,
@@ -234,9 +270,10 @@ level6 = {
 		{x=62/8,y=87/8, maxy=0,minx=55, maxx=65}
 	},
 	c={
-		{x=62/8,y=5, id=11}
+		{x=62/8,y=5, id=11},
+		{x=91/8,y=200/8, id=16}
 	},
-	blocks="1:16,2:16,3:16,4:16,5:0,6:-8,colide:false,fill:14|1:16,2:15,3:16,4:5,5:0,6:-3,colide:false,fill:6|1:48,2:16,3:16,4:3,5:0,6:-6|1:16,2:15,3:14,4:4,5:1,6:-2|1:16,2:15,3:14,4:4,5:1,6:2,colide:false,fill:3|1:37,2:12,3:4,4:7,5:6,6:-8|1:0,2:3,3:16,4:16,5:0,6:0,update:level6_adj"
+	blocks="1:0,2:0,3:0,4:0,5:0,6:0,draw:level6_bg|1:16,2:16,3:32,4:16,5:0,6:-8,colide:false,fill:14|1:16,2:15,3:32,4:5,5:0,6:-3,colide:false,fill:6|1:48,2:16,3:16,4:3,5:0,6:-6,rx:2|1:16,2:15,3:19,4:4,5:1,6:-2|1:16,2:15,3:32,4:4,5:1,6:2,colide:false,fill:3|1:37,2:12,3:4,4:7,5:9,6:-8|1:80,2:3,3:16,4:16,5:9,6:16|1:64,2:3,3:16,4:16,5:16,6:0|1:96,2:14,3:12,4:5,5:20,6:-5|1:27,2:0,3:2,4:2,5:16,6:14,key:level6_breakable,on_crash:crash_breakable|1:0,2:3,3:16,4:16,5:0,6:0,update:level6_adj|1:0,2:0,3:0,4:0,5:0,6:0,draw:level6_halo,front:true"
 }
 level7_adj = function()
     if(cam_x < 0)cam_x=0
@@ -348,8 +385,6 @@ level9_adj = function()
     enemies[1].maxx=player.x+5
     enemies[1].miny=player.y-5
     enemies[1].maxy=player.y+5
-    -- cam_x+=1
-    -- cam_x=min(cam_bounds[2], cam_x)
     cam_y-=3.5
     cam_y=max(cam_bounds[3], cam_y)
 end
