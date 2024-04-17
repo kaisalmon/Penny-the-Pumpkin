@@ -72,7 +72,7 @@ level1={
 	c={
 		{x=17,y=2.75,id=1}
 	},
-    blocks="1:32,2:5,3:16,4:9,5:0,6:0,rx:2,colide:false|1:32,2:12,3:16,4:1,5:0,6:8,ry:5,rx:2,colide:false|1:15,2:9,3:4,4:3,5:15,6:9,colide:false|1:0,2:3,3:32,4:16,5:0,6:0,update:level1_adj|1:27,2:0,3:2,4:2,5:1,6:12,on_crash:crash_breakable,key:level1",
+    blocks="1:32,2:5,3:16,4:9,5:0,6:0,rx:2,colide:false|1:32,2:12,3:16,4:1,5:0,6:8,ry:5,rx:2,colide:false|1:15,2:9,3:4,4:3,5:15,6:9,colide:false|1:0,2:3,3:32,4:16,5:0,6:0,update:level1_adj|1:27,2:0,3:2,4:2,5:1,6:12,on_crash:crash_breakable,key:level1_breakable",
 }
 level2_adj=function()
     if player.x < 0 and player.y < 100 then
@@ -340,7 +340,7 @@ level8_light = function ()
     rectfill(0,192,256,256,5)
     rectfill(0,128,16,160,5)
     rectfill(216,0,240,128,5)
-    draw_light(128,0,1,30)
+    if(broken_blocks.level1_breakable)draw_light(128,0,1,30)
     draw_light(24,0,1,30)
 end
 level8_adj = function()
@@ -365,7 +365,7 @@ level8={
 		{x=16,y=2.5,id=14},
 	},
 	chunk=32+chunk_size*0,
-	blocks="1:0,2:0,3:0,4:25.5,5:0,6:0,update:level8_adj,draw:level8_light|1:0,2:3,3:28,4:16,5:0,6:0|1:28,2:3,3:27,4:8,5:2,6:16|1:27,2:0,3:2,4:2,5:20,6:20,key:level8_breakable,on_crash:crash_breakable|1:0,2:0,3:0,4:0,5:0,6:0,draw:level8_halo"
+	blocks="1:0,2:0,3:0,4:25.5,5:0,6:0,update:level8_adj,draw:level8_light|1:0,2:3,3:28,4:16,5:0,6:0|1:28,2:3,3:27,4:8,5:2,6:16|1:27,2:0,3:2,4:2,5:20,6:20,key:level8_breakable,on_crash:crash_breakable|1:0,2:0,3:0,4:0,5:0,6:0,draw:level8_halo,front:true"
 }
 level9_draw =function()
     rectfill(0,-40,159,0,3)
@@ -428,10 +428,7 @@ level1_variant={
 	c={
 		{x=17,y=2.75,id=1}
 	},
-	{"41,0,3,3,10,-18",  draw=level1_v_draw,
-	update=level1_v_cam
-	},
-	blocks="1:41,2:0,3:3,4:3,5:10,6:-18,update:level1_v_cam,draw:level1_v_draw|1:51,2:0,3:5,4:3,5:-4,6:-7,colide:false,rx:9|1:51,2:0,3:36,4:4,5:-4,6:-4,colide:false,fill:3|1:0,2:3,3:1,4:3,5:0,6:-3|1:9,2:0,3:5,4:19,5:-5,6:-3,colide:false,fill:5|1:9,2:0,3:5,4:3,5:-4,6:-6,tile:true|1:46,2:0,3:5,4:1,5:-4,6:-7,colide:false|1:32,2:5,3:16,4:9,5:0,6:0,colide:false,rx:2|1:32,2:12,3:16,4:1,5:0,6:8,rx:2,ry:5,colide:false|1:15,2:9,3:4,4:3,5:15,6:9,colide:false|1:0,2:3,3:32,4:16,5:0,6:0,update:level1_adj|1:27,2:0,3:2,4:2,5:1,6:12,key:level1,on_crash:crash_breakable"
+	blocks="1:41,2:0,3:3,4:3,5:10,6:-18,update:level1_v_cam,draw:level1_v_draw|1:51,2:0,3:5,4:3,5:-4,6:-7,colide:false,rx:9|1:51,2:0,3:36,4:4,5:-4,6:-4,colide:false,fill:3|1:0,2:3,3:1,4:3,5:0,6:-3|1:9,2:0,3:5,4:19,5:-5,6:-3,colide:false,fill:5|1:9,2:0,3:5,4:3,5:-4,6:-6,tile:true|1:46,2:0,3:5,4:1,5:-4,6:-7,colide:false|1:32,2:5,3:16,4:9,5:0,6:0,colide:false,rx:2|1:32,2:12,3:16,4:1,5:0,6:8,rx:2,ry:5,colide:false|1:15,2:9,3:4,4:3,5:15,6:9,colide:false|1:0,2:3,3:32,4:16,5:0,6:0,update:level1_adj|1:27,2:0,3:2,4:2,5:1,6:12,key:level1_breakable,on_crash:crash_breakable"
 }
 
 levels={
