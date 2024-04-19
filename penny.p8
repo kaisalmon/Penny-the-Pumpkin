@@ -8,6 +8,7 @@ label=false
 max_coins=16
 function init()
 t=0
+t_scale=1
 broken_blocks={}
 wipe_progress = -1  -- -1: no transition, 0-128: transition in progress
 fc=0
@@ -265,6 +266,7 @@ end
 function _update60()
 	profile_cpu_usage=0
 	profile_calls=0
+
 	local stat_1 = stat(1)
 	t+=1/60
 	fc+=1
@@ -436,8 +438,8 @@ function lerp(a, b, t)
 end
 
 function update_character(ch, move_dir, jump, t_stretch, jump_held)
-	if (move_dir < 0) ch.dx -= ch.speed
-	if (move_dir > 0) ch.dx += ch.speed
+	if (move_dir < 0) ch.dx -= ch.speed*t_scale
+	if (move_dir > 0) ch.dx += ch.speed*t_scale
 	if (move_dir > 0) ch.facing = ➡️
 	if (move_dir < 0) ch.facing = ⬅️
 
@@ -460,8 +462,8 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 		local g =(ch.dy < 0 and ch.jumped_on_blob) and g1 
 				or (ch.dy < 0 and jump_held)and g1
 				 or g2
-		ch.dy+=g
-		ch.h.dy+=g
+		ch.dy+=g*t_scale
+		ch.h.dy+=g*t_scale
 	end
 
 	if jump and 
@@ -482,13 +484,13 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 		end
 	end
 
-	ch.dx *= 0.9
-	ch.dy -= sgn(ch.dy)
-		 * air
-			* ch.dy 
-			* ch.dy
-	ch.h.dx *= 0.96
-	ch.h.dy *= 0.95
+	ch.dx -= (0.1 * ch.dx) * t_scale
+	ch.dy -= (sgn(ch.dy)
+	* air
+	   * ch.dy 
+	   * ch.dy) * t_scale
+	ch.h.dx -= 0.04 * ch.h.dx * t_scale
+	ch.h.dy -= 0.05 * ch.h.dy * t_scale
 	local h = ch.size * ch.stretch
 	if(not ch.gnded and not ch.was_gnded) h=ch.size
 	local fh=0.015
@@ -499,9 +501,9 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 	local fxh = (ch.x - ch.h.x) 
 		* fh
 		
-	ch.h.dx += fxh
-	ch.h.dy += fyh
-	ch.dx -= fxh
+	ch.h.dx += fxh * t_scale
+	ch.h.dy += fyh * t_scale
+	ch.dx -= fxh * t_scale
 	
 	local min_h =ch.size/4+1
 	if ch.h.y + min_h > ch.y then
@@ -530,7 +532,7 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 	end	
 
 	local delta_s = ch.tsize - ch.size
-	ch.size += delta_s*0.2
+	ch.size += delta_s*0.2* t_scale
 	check_for_squeeze(ch)
 	ch.was_gnded = ch.gnded
 	ch.prev_block = ch.block
@@ -762,7 +764,7 @@ function update_particle(p, inc_semi)
 
 	x_col = is_colide(p.x+p.dx,p.y,p.w,false)
 	if not x_col then
-		p.x += p.dx
+		p.x += p.dx*t_scale
 	else
 		p.dx *= -1
 		p.dx *= p.bounce or 0
@@ -773,7 +775,7 @@ function update_particle(p, inc_semi)
 
 	y_col,tile = is_colide(p.x,p.y+p.dy,p.w,inc_semi)
 	if not y_col  then
-		 p.y += p.dy
+		 p.y += p.dy*t_scale
 	else
 		if p.dy > -.1 then
 			p.block = y_col
