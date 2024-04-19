@@ -1098,7 +1098,6 @@ function calc_cam_bounds()
 	cam_bounds = {1000,-1000,1000,-1000}
 	for b in all(blocks) do
 		if b.update != drop and b.colide!=false then
-			printh(b[1],"deleteme.txt",true)
 			if cam_bounds[1] > b[5]*8 then
 				cam_bounds[1] = b[5]*8
 			end
