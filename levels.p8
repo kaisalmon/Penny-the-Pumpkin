@@ -46,6 +46,7 @@ spooky_tunnel= split("0,130,131,132,0,5,13,136,137,9,3,12,13,8,4")
 forest_pal=split("138,2,3,4,147,6,7,8,9,10,11,12,13,-4,15")
 spooky_pal = split("128,130,131,132,133,5,134,136,137,9,3,12,13,8,4")
 day=split("-4,2,3,4,5,6,7,8,9,10,11,12,13,14,15")
+sea_pal=split("-4,2,3,4,5,6,7,8,9,10,11,12,13,-4,15")
 
 level1_adj = function(b)
     if player.x < -30 then
@@ -115,16 +116,6 @@ level3_draw = function ()
     fillp(0)
 end
 level3_adj = function()		
-    if fc%10==0 then
-        for x=0,128 do
-            for y=3,19 do
-                if(mget(x,y)==62)then mset(x,y,30)
-                elseif(mget(x,y)==46)then mset(x,y,62)
-                elseif(mget(x,y)==30)then mset(x,y,46)
-                end
-            end
-        end
-    end
     if player.x < 850 and player.x > 250 then
         player.y = max(2,player.y)
     end
@@ -202,6 +193,7 @@ level4={
 
 level5_adj = function()
     cam_x=max(0,cam_x-1)
+    cam_bounds[2] = 224
     if player.x < 0 then
         load_level(
             level4,
@@ -212,7 +204,7 @@ level5_adj = function()
 end
 level5={
 	chunk=3+chunk_size*2,
-	pal=day,
+	pal=sea_pal,
 	e={
 		{x=15,y=11,miny=20, maxy=100, minx=80, maxx=290},
 		{x=24,y=9,miny=20,  maxy=100, minx=80, maxx=290},
@@ -221,7 +213,7 @@ level5={
 	c={
 		{x=40,y=13,id=10},
 	},
-	blocks="1:35,2:0,3:6,4:3,5:4,6:5,colide:false,rx:7|1:35,2:0,3:48,4:8,5:0,6:8,colide:false,fill:6|1:111,2:9,3:6,4:5,5:11,6:11,update:drop|1:111,2:14,3:7,4:5,5:20,6:7,update:drop|1:41,2:0,3:3,4:3,5:16,6:5,update:drop|1:96,2:3,3:15,4:16,5:0,6:0|1:100,2:16,3:11,4:3,5:15,6:13,rx:3|1:6,2:0,3:3,4:3,5:38,6:13,update:level5_adj|1:118,2:3,3:4,4:16,5:44,6:0"
+	blocks="1:35,2:0,3:6,4:3,5:4,6:5,colide:false,rx:7|1:35,2:0,3:48,4:8,5:0,6:8,colide:false,fill:6|1:111,2:9,3:6,4:5,5:11,6:11,update:drop|1:111,2:14,3:7,4:5,5:20,6:7,update:drop|1:41,2:0,3:3,4:3,5:16,6:5,update:drop|1:96,2:3,3:15,4:4,5:0,6:0|1:96,2:7,3:15,4:12,5:0,6:4,front:true|1:100,2:16,3:11,4:3,5:15,6:13,rx:3,front:true|1:6,2:0,3:3,4:3,5:38,6:13,update:level5_adj|1:118,2:3,3:4,4:16,5:44,6:0"
 }
 level6_adj=function()
     if player.x < -2 then 
@@ -271,7 +263,7 @@ level6 = {
 	},
 	c={
 		{x=62/8,y=5, id=11},
-		{x=91/8,y=200/8, id=16}
+		{x=104/8,y=190/8, id=16}
 	},
 	blocks="1:0,2:0,3:0,4:0,5:0,6:0,draw:level6_bg|1:16,2:16,3:32,4:16,5:0,6:-8,colide:false,fill:14|1:16,2:15,3:32,4:5,5:0,6:-3,colide:false,fill:6|1:48,2:16,3:16,4:3,5:0,6:-6,rx:2|1:16,2:15,3:19,4:4,5:1,6:-2|1:16,2:15,3:32,4:4,5:1,6:2,colide:false,fill:3|1:37,2:12,3:4,4:7,5:9,6:-8|1:80,2:3,3:16,4:16,5:9,6:16|1:64,2:3,3:16,4:16,5:16,6:0|1:96,2:14,3:12,4:5,5:20,6:-5|1:27,2:0,3:2,4:2,5:16,6:14,key:level6_breakable,on_crash:crash_breakable|1:0,2:3,3:16,4:16,5:0,6:0,update:level6_adj|1:0,2:0,3:0,4:0,5:0,6:0,draw:level6_halo,front:true"
 }
@@ -321,6 +313,7 @@ function draw_light(x,y,c,r)
 	fillp(0)
 end
 function draw_dark_halo(half_radius)
+    half_radius+=sin(time()/2)*3
 	ovalfill(
 		player.x-half_radius,
 		player.y-half_radius,
