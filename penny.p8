@@ -1652,7 +1652,7 @@ function load_level_instant(level,x,y,dx,dy)
 	
 	blocks=level
 	for b in all(blocks) do
-		if broken_blocks[key] then 
+		if broken_blocks[b.key] then 
 			del(blocks,b)
 		end
 	end
