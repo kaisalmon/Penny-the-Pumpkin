@@ -1247,7 +1247,7 @@ level6 = {
 	pal=forest_pal,
 	chunk=3+chunk_size*3,
 	e={
-		{x=10,y=87/8, maxy=0,minx=72, maxx=88}
+		{x=10,y=87/8, maxy=0,minx=75, maxx=85}
 	},
 	c={
 		{x=10,y=5, id=11},
