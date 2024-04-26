@@ -1088,7 +1088,7 @@ level2={
 		{x=33,y=17,id=2},
 		{x=22.5,y=11,id=3}
 	},
-	blocks="1:6,2:5,3:48,4:3,5:0,6:-3,update:level2_adj,fill:3,colide:false|1:115,2:18,3:6,4:1,5:35,6:16,colide:false|1:32,2:5,3:16,4:9,5:-0.5,6:0,colide:false,rx:4|1:32,2:12,3:16,4:1,5:-0.5,6:8,rx:4,ry:9,colide:false|1:18,2:0,3:48,4:3,5:0,6:16,colide:false,tile:true|1:18,2:0,3:48,4:13,5:0,6:19,colide:false,fill:4|1:48,2:3,3:16,4:16,5:0,6:0|1:32,2:14,3:5,4:4,5:6,6:6|1:64,2:3,3:48,4:16,5:0,6:16|1:112,2:3,3:16,4:16,5:32,6:0|1:103,2:11,3:1,4:1,5:16.5,6:15,colide:false,front:true|1:106,2:3,3:4,4:4,5:0,6:28,colide:false,front:true|1:31,2:18,3:1,4:1,5:31,6:14,front:true,rx:3,ry:3,colide:false|1:25,2:8,3:3,4:5,5:21,6:11|1:21,2:11,3:1,4:2,5:20,6:14|1:27,2:0,3:2,4:2,5:7,6:28,on_crash:crash_breakable,key:level2_breakable|1:37,2:14,3:7,4:4,5:28,6:12"
+	blocks="1:6,2:5,3:48,4:3,5:0,6:-3,update:level2_adj,fill:3,colide:false|1:115,2:18,3:6,4:1,5:35,6:16,colide:false|1:32,2:5,3:16,4:9,5:-0.5,6:0,colide:false,rx:4|1:32,2:12,3:16,4:1,5:-0.5,6:8,rx:4,ry:9,colide:false|1:82,2:8,3:2,4:3,5:2,6:16,colide:false,rx:20|1:18,2:0,3:48,4:13,5:0,6:19,colide:false,fill:4|1:48,2:3,3:16,4:16,5:0,6:0|1:32,2:14,3:5,4:4,5:6,6:6|1:64,2:3,3:48,4:16,5:0,6:16|1:112,2:3,3:16,4:16,5:32,6:0|1:103,2:11,3:1,4:1,5:16.5,6:15,colide:false,front:true|1:106,2:3,3:4,4:4,5:0,6:28,colide:false,front:true|1:31,2:18,3:1,4:1,5:31,6:14,front:true,rx:3,ry:3,colide:false|1:25,2:8,3:3,4:5,5:21,6:11|1:21,2:11,3:1,4:2,5:20,6:14|1:27,2:0,3:2,4:2,5:7,6:28,on_crash:crash_breakable,key:level2_breakable|1:37,2:14,3:7,4:4,5:28,6:12"
 }
 
 level3_draw = function ()
@@ -1409,7 +1409,7 @@ level1_variant={
 	c={
 		{x=17,y=2.75,id=1}
 	},
-	blocks="1:41,2:0,3:3,4:3,5:10,6:-18,update:level1_v_cam,draw:level1_v_draw|1:51,2:0,3:5,4:3,5:-4,6:-7,colide:false,rx:9|1:51,2:0,3:36,4:4,5:-4,6:-4,colide:false,fill:3|1:0,2:3,3:1,4:3,5:0,6:-3|1:9,2:0,3:5,4:19,5:-5,6:-3,colide:false,fill:5|1:9,2:0,3:5,4:3,5:-4,6:-6,tile:true|1:46,2:0,3:5,4:1,5:-4,6:-7,colide:false|1:32,2:5,3:16,4:9,5:0,6:0,colide:false,rx:2|1:32,2:12,3:16,4:1,5:0,6:8,rx:2,ry:5,colide:false|1:15,2:9,3:4,4:3,5:15,6:9,colide:false|1:0,2:3,3:32,4:16,5:0,6:0,update:level1_adj|1:27,2:0,3:2,4:2,5:1,6:12,key:level1_breakable,on_crash:crash_breakable"
+	blocks="1:41,2:0,3:3,4:3,5:10,6:-18,update:level1_v_cam,draw:level1_v_draw|1:51,2:0,3:5,4:3,5:-4,6:-7,colide:false,rx:9|1:51,2:0,3:36,4:4,5:-4,6:-4,colide:false,fill:3|1:0,2:3,3:1,4:3,5:0,6:-3|1:9,2:0,3:5,4:19,5:-5,6:-3,colide:false,fill:5|1:9,2:0,3:2,4:3,5:-4,6:-6|1:9,2:0,3:3,4:3,5:-2,6:-6|1:46,2:0,3:5,4:1,5:-4,6:-7,colide:false|1:32,2:5,3:16,4:9,5:0,6:0,colide:false,rx:2|1:32,2:12,3:16,4:1,5:0,6:8,rx:2,ry:5,colide:false|1:15,2:9,3:4,4:3,5:15,6:9,colide:false|1:0,2:3,3:32,4:16,5:0,6:0,update:level1_adj|1:27,2:0,3:2,4:2,5:1,6:12,key:level1_breakable,on_crash:crash_breakable"
 }
 
 levels={
@@ -1502,20 +1502,6 @@ function is_solid_in_block(b, e,inc_semi)
 	local x = e.x/8 + b[1] - b[5]
 	local y = e.y/8 + b[2] - b[6]
 	local tile = mget(x,y)
-	if b.tile then
-		local x,y=b[1]+1,b[2]+1
-		if e.x/8-b[5] < 1 then
-			x-=1
-		elseif e.x/8-b[5] > b[3]-1 then
-			x+=1
-		end
-		if e.y/8-b[6] < 1 then
-			y-=1
-		elseif e.y/8-b[6] > b[4]-1 then
-			y+=1
-		end
-		tile = mget(x,y)
-	end
 	if fget(tile, 2) then
 		if(not inc_semi) return false
 		if(e.y % 8 > 4) return false
@@ -1547,27 +1533,7 @@ function draw_blocks(front)
 					b[6]*8+b[4]*8-1,
 					b.fill
 				)
-			elseif b.tile then
-
-				local i_min = max(0, ceil((cam_x - b[5]*8)/8)-1)
-				local j_min = max(0, ceil((cam_y - b[6]*8)/8)-1)
-				for i=i_min, min(b[3]-1, flr((cam_x+128-b[5]*8)/8)) do
-    for j=j_min, min(b[4]-1, flr((cam_y+128-b[6]*8)/8)) do
-						local sx,sy = 
-							b[1]+(i==0 and 0 or 1)+(i==(b[3]-1) and 1 or 0),
-							b[2]+(j==0 and 0 or 1)+(j==(b[4]-1) and 1 or 0)
-						local n = 1
-						local s=mget(sx,sy)
-						if s!=0 then
-							spr(s,
-								(b[5]+i)*8,
-								(b[6]+j)*8
-							)
-						end
-					end
-				end
-									
-				else
+			else
 				map(b[1],--src x
 				 b[2], --src y
 				 b[5]*8+ox*b[3]*8, --screen x
@@ -2094,12 +2060,12 @@ __map__
 2a2b0001020076a3787777780a0b107677787979795200500708094042002c2d373839104a4b4c4d10070809ecec7dd87ed97d001d0c1c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 3a3b001112005051525151521a1b1050515266666652005017181960620000007071724a4b5b5b4c4d174f19fcfd00000000001d0d6a0e1c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 3738397072000000005151521010106061624e4e4e547755171819a0a10000000000005a5b5b5b5b5d272829e1e2e3e40000000d6a6a6a0ec0c1c1c20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-fffff87fd3bfffe1a9003528be880b8c0cbb3bd1b8b0a81a8384f1a222b129a02abf028333300436b7319b9c1ca733b43c722a363d35943e3daf70a17121bfbcd2209b12930ffc69f99f9db626e2486e7aef279ee9f34fc3f13893e713f2fc784fc38fcedd7ff1bf3ffc8b6fe9fafe87e2e3f6fd7f5fd4bf7bfba7f073f9cb7f
-9e787f5c4feffce4fc161fa4ff5b7e88ffd8e8ff93c9c8ebce7f5ffc1495f5e5fb27fe149c71fbdffc5dbf39fbffe34fe6ce2ffe3bff4eaffe4ffcb3ff007fe3afd373bff1ffe3affcdd5ffc3fd7fe0d7ff3ffe8ffd274e3ff571f85727e53ff0bf29fb7fc7e9dcfc1c4ffd7ffb3bb245fdfff6cfce7fe17f2e3b8ffd4dffbb7
-eee8fc8fce039dd7dfb389fe7f9f859ffbf4bfcf1a5fea71b7fefffdbff80138733a7b3c70b31fcbf8dbff41ff8abff87ff193ff95d2d92dda7e7ff9fff9c7fe21c1edea708a3815e4ef87fe2b27ed0fd01f8cffe925ffea25be4fe627ff65311f8fa54e48e87282aa59df1fa7ff79117fa392953f1503c2a71c71ff8fa4e61f
-6e3ffc09ffe58ee7ec5ed3f79fbf6772c9c495fc83f0257fe40e24bc5fcbffc3d7c9f7327ffa9fd9af5dce7afbefc7f1fd7f5fd7a73c497f12bd1f93ff0707527f3dcfc7f149ff8d3f38bd7e0a7133f2df83ff27fe6e5ffc53ffdd5fff9fff3ffe74fff953a7f34eafff3ffd3fff7f28fff07f5371792b9904e49fa399feffe6
-93f739fc3f2fca06937e3c9c3e93f9ff470fff8731fb37e323167ffab20bf8cfffc9ffe5d43b7e27ed771f9bff091bff1fedff8ebb4e7fb7f8d0b0b16138fdbf6fe534058d8947afff64eb69ea483f1649d529eefcbf5e670fffe01ff9ff0e3fff83f97fe4fffe1393496cfcff3e52276841092ee4e2fe7fa7eb6ffbffabfeb2
-7e2e7ff54fe97b9129ed7fff09d5cfc50f0ef8d2eaebf7fddfcfe9ffa9ca1fbd9a27fbfffb9410ff61735479c1e21c737f1fe6ce9ffb7ff47fe9ffd5fdfbf8c81048e4d4ed02f2000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+fffff87fd3bfffe1a9003528be880b8c0cbb3bd1b8b0a81a8384f1a222b129bca02abf028333300436b7319b9c1ca733b43c722a363d35943e3daf70a17121bfd2209b12930ffc69f99f9db626e2486e7aef279ee9f34fc3f13893e713f2fc784fc38fcedd7ff1bf3ffc8b6fe9fafe87e2e3f6fd7f5fd4bf7bfba7f073f9cb7f
+9e787f49fda4ff3fde4fc161fa4ff9b7ea8ffd8ecffc09e4e475ef3fb7fe1a4afaf37f7e3ff104e79fdeffe3f1f9cfdfff227f36717ff25ffc13abff97ff34ffc01ff92bf5dceffc9ff92bff3f57ff17f5ff875ffd1ffa7ff55e3ff5dfab93f29ff89f94fdfff01faf73e713ff67fedeec917f6ffdd3f39ff89fcb893e68ffd6
+dffbf8fe1d1f91f9c073baf7f6713fdff7f0b3ff8712ff1ce97f99c6dffc3ff77fe104e1cdedd8e0032cc7f2fe36ffd27fe2affe3ffca4ffe774b64b769f9ffe8ffe91ff8c707b7a9c0e9651cf4fedff8ec98fc61fa03f19ffd64bffd84b7c9fcc4ffee90c47e3e953c75d9c2a59df1f9fff89117fa392953f1503c2a71c71ff
+93a4e61f6e3ffc89ffe98ee7ea5e93f79fbf6772c9c495fc83f0257fe50e24bc5fc7ffcbd7a9f7327ffb9fd9af5dce7af7efc3f0fd3f4fd3a73c497f12bd1f93ff0f07527f3dcfc7f149ff913f38bd7e0a7133f2df83ff2ffe7e5ffc93ffe551d3f4a9d3f7a757ffa7feafffbf947ff93f89b8bc95cc82724fd1ccffbff3c9ff
+ace7f0fcbf281a4df8f270fa4fe3fe1c21cedff48c59ffeac82fe33fff27ffa750edf89fb5dc7e6ffc446ffc9fb7fe4aed39fe9fe342c2c584e3f6fdbf94d01636251ebffe13ada7a920fc592774a7bbf2fd799c3fff807fe8fc38fffe0fe7ff97fff84e4d25b3f3fcf9489da10424bb938bf9fe9fadbff7febffc164fc5cffe
+b9fd2f72253dafffe13ab9f8a1e1df1a5d5d7effbbf9fd3ff5b943f7b344ffbfff72821fec2e6a8f383c438e6fe3fcd9d3ff77fe9ffd5ffaffbf7f1902091c9a9da05e40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 fffff87fd3bffd6a400c0c28aa2a0de4688c4bcfe6e70723c7ce6a6a883c480aac6c8e4e0845c0c6a866cb8fafc2495b71c71273d5d7bbc74e35f3d9fb4f9307d38e36e3df6e9f83f19ef52756a7e6bccfc3973f8fe5f9f7f9f80f0d27e0b3df74e38fd9f8fedd731d3cfca3c5dc61e4da3cb568fd04fd1cd95fa3affd13f576
 de70fa6773f057e3a47f53f657efc6e1559522713ff96693d54f215bf01d613f59fc7f3276bbf2f3cf2464945123ffa51f855b626dec95485fcecfd28e4f61fbcfe9e97378fc41f8899ecfeffcfea271fbffb666b2ac9047e7d7fdff81ff87affc5784a1fd7e6ff7f2e12f2f27e9533f5d274eca009617e9f34ff536ffa3a58f
 e6493e7df9afd7fe931f9d9567fe3750ff841a755c4faed5269527293f149524491102449c0fcd387ed7ff27fe4ffc9f94b167309cc8fcab989c35fdb9e66e4efff4f1cba9cf09fe7925fc3f0fc272391f94ffcae3bf387480e0b117d8d3c7fe221fcc99377a7f57a6fd67fe6bc2339e10b274e6bc7fbff9e7e3f8f97c93f224
