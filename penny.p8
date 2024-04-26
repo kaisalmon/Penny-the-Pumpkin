@@ -721,6 +721,7 @@ function is_colide(x,y,w,inc_semi, h)
 end
 
 function eject_particle(p, x, y)
+	if(not p.important) return
 	if not is_colide(p.x, p.y, p.w,false) then
 		return
 	end
@@ -758,7 +759,7 @@ function eject_particle(p, x, y)
 end	
 
 function update_particle(p, inc_semi)
-	if(p.important)eject_particle(p, 1, 1)
+	eject_particle(p, 1, 1)
 
 	x_col = is_colide(p.x+p.dx,p.y,p.w,false)
 	if not x_col then
@@ -914,8 +915,10 @@ end
 --dust
 function add_dust(ch, dy, dx,fullh, t, type)
 	if(ch != player and type!="coin")return
-	if stat(7)<60 or #dust > 30 then
+	if stat(7)<60 then
 		deli(dust, 1)	
+	end
+	if #dust > 30 then
 		deli(dust, 1)	
 	end
 	add(dust, {
@@ -1629,7 +1632,8 @@ function load_level_instant(level,x,y,dx,dy)
 	cam_x = player.x - 64
 	cam_y = player.y - 100
 	
-	check_for_squeeze(player)	
+	check_for_squeeze(player)
+	eject_particle(player, 1, 1)	
 	
 	if #coins == 0 then
 		coin_at=time()
@@ -1711,7 +1715,7 @@ function spawn_enemy(e)
 		h={
 			x=e.x*8,
 			y=e.y*8-14,
-			imporant=true,
+			important=true,
 			dx=0,
 			dy=0,
 			w=12,
