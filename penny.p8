@@ -17,6 +17,7 @@ moved=false
 shake=0
 player = {
 	on_land=on_land,
+	important=true,
 	x=0,
 	y=0,
 	dx=0,
@@ -29,6 +30,7 @@ player = {
 	h={
 		x=0,
 		y=0,
+		important=true,
 		dx=0,
 		dy=0,
 		w=8,
@@ -529,11 +531,11 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 	if ch.h.y + min_h > ch.y then
 		if(ch.h.dy>0)ch.h.dy *= -1
 		ch.h.y = ch.y-min_h
-		eject_particle(ch.h, false, 0.5, 1)
+		eject_particle(ch.h, 0.5, 1)
 		if (ch.y != ch.h.y+min_h) then
 			ch.y = ch.h.y+min_h
 			ch.dy *= -1 * ch.bounce
-			if is_solid(ch, true) and ch == player then
+			if is_solid(ch.x,ch.y, true) and ch == player then
 				die()
 			end
 		end
@@ -548,7 +550,7 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 	local max_h = ch.size*ch.stretch*1.25
 	if ch.h.y + max_h < ch.y then
 		ch.h.y = ch.y-max_h
-		eject_particle(ch.h, false, 0.5, 1)
+		eject_particle(ch.h, 0.5, 1)
 	end	
 
 	local delta_s = ch.tsize - ch.size
@@ -672,34 +674,16 @@ end
 function check_for_squeeze(p)
 	if(p != player)return
 	
-	if(is_solid({
-			y=p.y,
-			x=p.x,
-	})) then 
+	if is_solid(p.x,p.y) then 
 		return false
 	end
 	while true do
-		local right_col = is_solid({
-			y=p.y,
-			x=p.x+p.w/2+1,
-		}) and is_solid({
-			y=p.y,
-			x=p.h.x+p.h.w/2+1,
-		})
-		local left_col = is_solid({
-			y=p.y,
-			x=p.x-p.w/2-1,
-		}) and is_solid({
-			y=p.y,
-			x=p.h.x-p.h.w/2-1,
-		})
+		local right_col = is_solid(p.x+p.w/2+1, p.y) and is_solid(p.h.x+p.h.w/2+1, p.y)
+		local left_col = is_solid(p.x-p.w/2-1, p.y) and is_solid(p.h.x-p.h.w/2-1, p.y)
 		p.w-=1
 		p.h.w-=1
 		if right_col and left_col then 
-			if 	is_solid({
-				y=p.h.y-1,
-				x=p.h.x,
-			}) 	then 
+			if 	is_solid(p.h.x, p.h.y-1) 	then 
 				p.y += 1
 				p.h.y += 1
 			else
@@ -732,18 +716,15 @@ function is_colide(x,y,w,inc_semi, h)
 	
 	for _,y2 in ipairs(ys) do
 		for i,x2 in ipairs(xs) do
-			local b,tile = is_solid({
-				y=y2,
-				x=x2,
-			},inc_semi)
+			local b,tile = is_solid(x2,y2,inc_semi)
 			if(b)return b,tile
 		end
 	end
 	return false
 end
 
-function eject_particle(p, inc_semi, x, y)
-	if not is_colide(p.x, p.y, p.w,inc_semi) then
+function eject_particle(p, x, y)
+	if not is_colide(p.x, p.y, p.w,false) then
 		return
 	end
 	local ty1,ty2=p.y,p.y
@@ -755,22 +736,22 @@ function eject_particle(p, inc_semi, x, y)
 	 tx1-=x
 	 tx2+=x
 		i+=1
-	 local collide_ty1 = is_colide(p.x, ty1, p.w,inc_semi)
+	 local collide_ty1 = is_colide(p.x, ty1, p.w,false)
 	 if not collide_ty1 then
 	  p.y = ty1
 	  break
 	 end
-	 local collide_ty2 = is_colide(p.x, ty2, p.w,inc_semi)
+	 local collide_ty2 = is_colide(p.x, ty2, p.w,false)
 	 if not collide_ty2 then
 	  p.y = ty2
 	  break
 	 end
-	 local collide_tx1 = is_colide(tx1, p.y, p.w,inc_semi)
+	 local collide_tx1 = is_colide(tx1, p.y, p.w,false)
 	 if not collide_tx1 then
 	  p.x = tx1
 	  break
 		end
-	 local collide_tx2 = is_colide(tx2, p.y, p.w,inc_semi)
+	 local collide_tx2 = is_colide(tx2, p.y, p.w,false)
 	 if not collide_tx2 then
 	  p.x = tx2
 	  break
@@ -780,7 +761,7 @@ function eject_particle(p, inc_semi, x, y)
 end	
 
 function update_particle(p, inc_semi)
-	eject_particle(p, inc_semi, 1, 1)
+	if(p.important)eject_particle(p, 1, 1)
 
 	x_col = is_colide(p.x+p.dx,p.y,p.w,false)
 	if not x_col then
@@ -797,22 +778,22 @@ function update_particle(p, inc_semi)
 	if not y_col  then
 		 p.y += p.dy*t_scale
 	else
-		if p.dy > -.1 then
-			p.block = y_col
-		end
-		if fget(tile, 7) and not fget(tile, 1) then 
-			if p==player  then
-				die()
-			end
-		end
-		if fget(tile, 7) and fget(tile, 1) then 
-			if p==player or p==player.h then
-				die()
-			end
-		end
 		local override_bounce = false
-		if p.on_land  then
-			override_bounce = p.on_land(p)
+		if p.important then
+			if p.dy > -.1 then
+				p.block = y_col
+			end
+			if p==player or p==player.h then
+				if fget(tile, 7) and not fget(tile, 1) then 
+					die()
+				end
+				if fget(tile, 7) and fget(tile, 1) then 
+					die()
+				end
+			end
+			if p.on_land  then
+				override_bounce = p.on_land(p)
+			end
 		end
 		if not override_bounce then
 			p.dy *= -(p.bounce or 0)
@@ -1460,17 +1441,14 @@ end
 -->8
 --level loading
 
-function is_solid(p,inc_semi)
+function is_solid(x, y,inc_semi)
 	for b in all(blocks) do
 		if b.colide != false then
-			local x,w,h=p.x,
-								b[3]*(b.rx or 1),
-								b[4]*(b.ry or 1)
+			local w,h=b[3]*(b.rx or 1), b[4]*(b.ry or 1)
 								
 			if x/8 > b[5]
 			and x/8 < b[5]+w
 			then
-				local y=p.y
 				if y/8 > b[6]
 				and y/8 < b[6]+h
 				then
@@ -1484,10 +1462,7 @@ function is_solid(p,inc_semi)
 						y%=b[4]*8
 						y+=b[6]*8
 					end
-					local tile = is_solid_in_block(b,{
-						x=x,
-						y=y
-					},inc_semi)
+					local tile = is_solid_in_block(b,x,y,inc_semi)
 					if tile then
 						return b, tile
 					end
@@ -1498,17 +1473,17 @@ function is_solid(p,inc_semi)
 	return false
 end
 
-function is_solid_in_block(b, e,inc_semi)
-	local x = e.x/8 + b[1] - b[5]
-	local y = e.y/8 + b[2] - b[6]
+function is_solid_in_block(b, e_x, e_y, inc_semi)
+	local x = e_x/8 + b[1] - b[5]
+	local y = e_y/8 + b[2] - b[6]
 	local tile = mget(x,y)
 	if fget(tile, 2) then
 		if(not inc_semi) return false
-		if(e.y % 8 > 4) return false
+		if(e_y % 8 > 4) return false
 		return tile
 	end
 	if fget(tile, 0) then
-		if(e.y % 8 < 5) return false
+		if(e_y % 8 < 5) return false
 		return tile	
 	end
 	if fget(tile, 3) then
@@ -1723,6 +1698,7 @@ function spawn_enemy(e)
 	add(enemies, {
 		x=e.x*8,
 		y=e.y*8-2,
+		important=true,
 		pumpkin=e.pumpkin,
 		maxx=e.maxx,
 		minx=e.minx,
@@ -1739,6 +1715,7 @@ function spawn_enemy(e)
 		h={
 			x=e.x*8,
 			y=e.y*8-14,
+			imporant=true,
 			dx=0,
 			dy=0,
 			w=12,
@@ -2093,6 +2070,7 @@ __sfx__
 000a000e2755027550275501d550275502755027550275501c5502755027550275502755027550216500000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 000f00081300026350000002b3501a350000001935000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0006080000000270502a0502c0503005032050370503b0503f0500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+00100300000001f0501f0500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __music__
 00 06074344
 
