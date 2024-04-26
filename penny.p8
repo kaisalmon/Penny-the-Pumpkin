@@ -5,7 +5,7 @@ __lua__
 title_y=8
 label=false
 
-max_coins=16
+max_coins=18
 function init()
 t=0
 t_scale=1
@@ -115,7 +115,7 @@ function _draw()
 			blocks == level9 and 12 or e.pumpkin and 0 or 3
 		)
 	end)
-		
+			
 	if died_at == nil and not flicker then 
 		if heart_thought_t>1 or hold_thought_t > 4 then
 			spr(time()%1.5 > .75 and 229 or 231,player.x-5,player.h.y-20,2,2)
@@ -203,19 +203,7 @@ function _draw()
 	end
 	
 	local x=30
-	--values 0x10 and 0x30 to 0x3f change the effect
--- poke(0x5f5f,0x10)
---new colors on the affected line
--- pal(blocks.pal == tunnel and 
--- split("0,0,0,132,0,0,0,0,137,9,0,0,13,0,0")
---  or split("131,130,131,132,133,5,6,136,137,9,11,12,13,-4,15"),2)
---0x5f70 to 0x5f7f are the 16 sections of the screen
---0xff is the bitfield of which of the 16 line of the section are affected
- pal_memset(0x5f70,0,16)
- local z=flr(title_y)%8
- pal_memset(0x5f70+(title_y)/8-1,255<<z,1)
- pal_memset(0x5f70+(title_y)/8,255,5)
- pal_memset(0x5f70+(title_y)/8+5,~(255<<z),1)
+
 	for i,v in ipairs({
 		{x-1,title_y},
 		{x+1,title_y},
@@ -238,8 +226,7 @@ function _draw()
 			print("by kai salmon",v[1]+24,v[2]+32,9)
 		end
 	end
-	end		
-
+	end	
 end
 
 local min_mem = 0x5f70
@@ -319,7 +306,7 @@ function _update60()
 	end
 	
 	if died_at and died_at < time() - 1 then
-		load_level(blocks,blocks.px,blocks.py,blocks.pdx,blocks.pdy)
+		load_level_instant(blocks,blocks.px,blocks.py,blocks.pdx,blocks.pdy)
 		died_at = nil
 		revived_at = time()
 		if time() < 1.5 then
@@ -707,7 +694,7 @@ function foo()
 	end
 end
 
-function is_colide(x,y,w, inc_semi, h)
+function is_colide(x,y,w, inc_semi)
 	local xs,ys = {x},{y}
 	if w then 
 		xs = {}
@@ -718,7 +705,6 @@ function is_colide(x,y,w, inc_semi, h)
 		add(xs, x+w/2)
 		add(xs, x-w/2)
 	end
-	if(h)add(ys, (y+h.y)/2)
 	
 	for _,y2 in ipairs(ys) do
 		for i,x2 in ipairs(xs) do
@@ -768,7 +754,7 @@ function eject_particle(p,inc_semi, x, y)
 end	
 
 function update_particle(p, inc_semi)
-	eject_particle(p,p.dy>0 and not p.head, 1, 1)
+	eject_particle(p,p.dy>=0 and not p.head, 1, 1)
 
 	x_col = is_colide(p.x+p.dx,p.y,p.w,false)
 	if not x_col then
@@ -997,7 +983,7 @@ end
 drop = function(b)
 	b.oy=b.oy or b[6]
 	b.ow=b.ow or b[3]
- b.t=b.t or 0
+ 	b.t=b.t or 0
 	
 	b[3] = b.t < 0 and time() % 0.3 > 0.15 and 0 or b.ow
 	b.colide = not (b.t < 0)
@@ -1016,6 +1002,14 @@ drop = function(b)
 	
 	if b[6] - b.oy > 100 then
     b.t, b[6], b.dy = -60, b.oy, 0
+	end
+end
+
+function drop_island(b)
+	drop(b)
+	if b.t < 42 then
+		local dy = sin(t/2+b[5]*5.314)/50
+		b[6]+=dy
 	end
 end
 
@@ -1121,7 +1115,8 @@ level3={
 	c={
 		{x=2.5,y=4,id=4},
 		{x=45.5,y=10,id=5},
-		{x=76.5,y=13,id=6}
+		{x=76.5,y=13,id=6},
+		{x=13.5,y=12.75,id=18}
 	},
 	e={
 		{x=86.5,y=11, minx=675, maxx=760, maxy=103},
@@ -1139,7 +1134,7 @@ level4_adj = function()
             load_level(level6,195,215)
         end
     elseif player.x > 388 then
-        load_level(level5, 0, player.y < 30 and 0 or 64)		
+        load_level(level5, 0, player.y < 30 and 23 or 79)		
     end
 end
 
@@ -1171,12 +1166,13 @@ level4={
 
 level5_adj = function()
     cam_x=max(0,cam_x-1.75)
-   	cam_bounds[2] = 224
+	cam_bounds[3] = -50
+   	cam_bounds[2] = 254
     if player.x < 0 then
         load_level(
             level4,
-            385,
-            player.y > 35 and 70 or 0
+            378,
+            player.y
         )
     end
 end
@@ -1184,14 +1180,15 @@ level5={
 	chunk=3+chunk_size*2,
 	pal=sea_pal,
 	e={
-		{x=15,y=11,miny=20, maxy=100, minx=80, maxx=290},
-		{x=24,y=9,miny=20,  maxy=100, minx=80, maxx=290},
-		{x=33,y=11,miny=20,  maxy=100, minx=80, maxx=290}
+		{x=15,y=11,miny=20, maxy=100, minx=80, maxx=220},
+		{x=24,y=9,miny=20,  maxy=100, minx=180, maxx=250},
+		{x=33,y=11,miny=20,  maxy=100, minx=250, maxx=330}
 	},
 	c={
 		{x=40,y=13,id=10},
+		{x=4,y=-4,id=17},
 	},
-	blocks="1:35,2:0,3:6,4:3,5:4,6:5,colide:false,rx:7|1:35,2:0,3:48,4:8,5:0,6:8,colide:false,fill:6|1:111,2:9,3:6,4:5,5:11,6:11,update:drop|1:111,2:14,3:7,4:5,5:20,6:7,update:drop|1:41,2:0,3:3,4:3,5:16,6:5,update:drop|1:96,2:3,3:15,4:11,5:0,6:0|1:96,2:14,3:15,4:5,5:0,6:11,front:true|1:100,2:16,3:11,4:3,5:15,6:13,rx:3,front:true|1:6,2:0,3:3,4:3,5:38,6:13,update:level5_adj|1:118,2:3,3:4,4:16,5:44,6:0"
+	blocks="1:35,2:0,3:6,4:3,5:4,6:5,colide:false,rx:9|1:35,2:0,3:48,4:8,5:0,6:8,colide:false,fill:6|1:111,2:9,3:6,4:5,5:19,6:2,update:drop_island|1:41,2:0,3:3,4:3,5:14,6:-2,update:drop_island|1:111,2:9,3:6,4:5,5:11,6:11,update:drop_island|1:111,2:14,3:7,4:5,5:17,6:7,update:drop_island|1:41,2:0,3:3,4:3,5:12,6:5,update:drop_island|1:96,2:3,3:15,4:11,5:0,6:0|1:96,2:14,3:15,4:5,5:0,6:11,front:true|1:100,2:16,3:11,4:3,5:15,6:13,rx:4,front:true|1:6,2:0,3:3,4:3,5:44,6:12,update:level5_adj|1:11,2:6,3:4,4:6,5:2,6:-3|1:118,2:3,3:4,4:16,5:50,6:0"
 }
 level6_adj=function()
     if player.x < -2 then 
@@ -1488,11 +1485,11 @@ function is_solid_in_block(b, e_x, e_y, inc_semi)
 	local tile = mget(x,y)
 	if fget(tile, 2) then
 		if(not inc_semi) return false
-		if(e_y % 8 > 4) return false
+		if(y*8 % 8 > 4) return false
 		return tile
 	end
 	if fget(tile, 0) then
-		if(e_y % 8 < 5) return false
+		if(y*8 % 8 < 5) return false
 		return tile	
 	end
 	if fget(tile, 3) then
@@ -1535,7 +1532,7 @@ end
 function calc_cam_bounds()
 	cam_bounds = {1000,-1000,1000,-1000}
 	for b in all(blocks) do
-		if b.update != drop and b.colide!=false then
+		if b.update != drop and b.update != drop_island and b.colide!=false then
 			if cam_bounds[1] > b[5]*8 then
 				cam_bounds[1] = b[5]*8
 			end
@@ -2024,7 +2021,7 @@ __gff__
 __map__
 2a2b0001020076a3787777780a0b107677787979795200500708094042002c2d373839104a4b4c4d10070809ecec7dd87ed97d001d0c1c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 3a3b001112005051525151521a1b1050515266666652005017181960620000007071724a4b5b5b4c4d174f19fcfd00000000001d0d6a0e1c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-3738397072000000005151521010106061624e4e4e547755171819a0a10000000000005a5b5b5b5b5d272829e1e2e3e40000000d6a6a6a0ec0c1c1c20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+3738397072005051525151521010106061624e4e4e547755171819a0a10000000000005a5b5b5b5b5d272829e1e2e3e40000000d6a6a6a0ec0c1c1c20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 fffff87fd3bfffe1a9003528be880b8c0cbb3bd1b8b0a81a8384f1a222b129bca02abf028333300436b7319b9c1ca733b43c722a363d35943e3daf70a17121bfd2209b12930ffc69f99f9db626e2486e7aef279ee9f34fc3f13893e713f2fc784fc38fcedd7ff1bf3ffc8b6fe9fafe87e2e3f6fd7f5fd4bf7bfba7f073f9cb7f
 9e787f49fda4ff3fde4fc161fa4ff9b7ea8ffd8ecffc09e4e475ef3fb7fe1a4afaf37f7e3ff104e79fdeffe3f1f9cfdfff227f36717ff25ffc13abff97ff34ffc01ff92bf5dceffc9ff92bff3f57ff17f5ff875ffd1ffa7ff55e3ff5dfab93f29ff89f94fdfff01faf73e713ff67fedeec917f6ffdd3f39ff89fcb893e68ffd6
 dffbf8fe1d1f91f9c073baf7f6713fdff7f0b3ff8712ff1ce97f99c6dffc3ff77fe104e1cdedd8e0032cc7f2fe36ffd27fe2affe3ffca4ffe774b64b769f9ffe8ffe91ff8c707b7a9c0e9651cf4fedff8ec98fc61fa03f19ffd64bffd84b7c9fcc4ffee90c47e3e953c75d9c2a59df1f9fff89117fa392953f1503c2a71c71ff
@@ -2037,12 +2034,12 @@ e6493e7df9afd7fe931f9d9567fe3750ff841a755c4faed5269527293f149524491102449c0fcd38
 f6fe49d4ea631f9c9c21649c4f927c93a7cfdb99ea1e4aa7fe3bffa38e891c92b914fce1bc72e1bcf62fcffd2359ffaa789c3c93c49f24f95df93b927fe84848484876f65910c7e90c90061ecdf97934962fe30f2447fe1ff1bc2a7e723f491a05ed2c11bff0baff4fc0fcc0bc7fbffef93b9fffca241fffcba9fd139fffe67f
 e7ff7fdffcc5ff7ff57fd2fff07e09ff8b893e6896c923ff0aa35ffc5ff8bfff9abff8fff037cfc3f0fc3f0ffe3fffcefe3c93913fff9fc92c739fffd0b3ffe18fdbfffa34fe84cea0b27bf8ef44cfffe17effffc25a99fffd2cfffe9faf13a75213f57d3fffa9fffd58fffe79f777f5ff6fee00000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-fffff87fd3bfffe70028a90c0cbebf0bab2cabac282230b1038404a323a434f122b324bb2af8793bd1bc130a940b129ef89e6a6ae1e26060e13fb03c9493a525a72daa212d2fa7b970a083521ca0685a7ff53db2e6e38e493a389d77e7bf75cf367964b789f85fe63f089ffe8ef8fc7f2fcf9edcfe9fafecfdff893f939fdbfa
-fdbf67e3f9bf6fed3f29fdbff84913fcabfe7fbedb244fc7fe70fcbf5fdba71e7b74c4389ff83ff0f17ff17fe39f91e5ffc9ff95c4ffcd53bff93ff05ff25a96c7fe592ff327e04fceb3f4fd7ff3b45ffc09127fe8ffd2e3ff55ffd7fc39dff87ff27fe547f33f2ffd8ffdbffbbff7fff097f0df938e3f534ffc9ffb1bff2fff
-1ffe5f9db3efb4faff1cfff3ffe9ffd7faffed049ffdf04938dffe1ff97ff0b8fa7fe8fff3fd38fff5ffabf04e932a7ebffb398e74fd79e4fc50e4eabfe10434f3c4f2c96c96e177ffbfff8bf898a72bcceff09bff17ff2e967edfff69dc93ff31ca7b3efb2682fdf7c26fff7ff7ffe0e273f84bff9cb6ff22b6bffe7713f9fe
-4fe4ffd10e9063a9ffabfabbff5d3f0bfffc0fffe0b547076bd088907fff0ad4bc24dfffc0ffd0957f29fe4358720fc67fff0c7fff125e7ffbbf07fe6fe06fdfbefb5416c1373dcb2cffdcffc159c1f973ffebffaffff11ffb9647bb5fffe2a4ecfade927f08902700ee7fff18593f21ff9004f52fbe709e50e3ff4ff53ff512
-92fdc9c27275c17970eb9a9c766052dadaa33b5b7f08bd24ab3f07fe05fe3ff26e6ffe1fc5e3fff8fc4fffe14ff2124baa69389cd9d4704e9f9c3c52749645aefff3d7fe597ff57e6faffe3f7fff91deef7ff7ffef26b0fcae389df69dd6ffbfefe4e13fff93fffcae384a7e724d7d4ec87affede89fffc8fbc46e87e7cffff2
-effff23ff9848e34f20e1c7ec7472770ff62fdcf6ffc17fff81bd4b67f517f6fceb9e7ba11f88bc7fe0ffc3fdfee256fdb05be1ff9e4fffe67acaffdee21c2797fff8ffffc489cce2f6953b3f604b6bff53fff9bf47febfc80000000000000000000000000000000000000000000000000000000000000000000000000000000
+fffff87fd3bfffe38028a90c0cbebf0bab2cabac282230b1038404a323a434f122b324bb2abbd1bc130a940b12e1e26060e13fb03c9493a525a72daa212d2fa7b970a083521ca0685a7ff53db2e6e38e493a389d77e7bf75cf367964b789f85fe63f089ffe8ef8fc7f2fcf9edcfe9fafecfdff893f939fdbfafdbf67e3f9bf6f
+ed3f29fdbff84913fcabfe7fbedb244fc7fe70fcbf5fdba71e7b74c438e3ff07fe1fc6cfdcf2ffe2ffc6e27fe4a9d7f89fedff25a96c7fe392ff327e04fceb3f4fd7ff2b45ffc09127fe6ffcee3ff45ffd3fc39dff87ff17fe347f2bff89cd9ccff0d3fdffccdff7feaffd7f9db3bef4eeff1cffecffdbffbbfaffdf049ffc30
+4938dffc5ff93ff0b8fa7fe6ffe5fd38ffe7ffa3f04e932f53fedf91f8a1c9d57fc20869d749d592d92dc2effe9ffd57f1314e5799dfe137fdffb3a59fb7ff6a7713f74fc4e53d9e7993417cf3c137ff4ffbffb87139fc25ffca5b7f915b5ffe5b89fcff27f27fe88740fc27fe5fdaeffcd4fc2fff8fff2d51c1daf422241ffe
+ad4bdefff1ff992afe53fc86b0ecfc67ffb1fff25e7ff83f07fe6fe06fdfbefb5416c1373dcb2cffdd3ff056707e5cfff3ffe9fff1ffb9647bb5fffa93b3eb7a49fc22409c03b9fff8593f21ff9004f52fbe709e50e3fafea7fe52525fb9384e0ef82f2e1d73538ecc0a5b5b54676b6fe117a49567e1c7fe17f3ff8b737ff0fe
+2f1fffc0e27e37fc84926a9a4e2736f71c13b7e70f149d25916bbffcb5ff8e5ffe1f9bebff8fdfffe0f7bcdffc3ff849ac3f2b8e277da775bfeffbf9384fffe17fff0f8e129f9c935f53b21ebff7fa27fff07ef11ba1f9f3fffc49fffc1ffe61238d3c83871fb1d1c9dc3fd8bf73dbff05fff1bd4b67f517f6eab9e7ba11f88b
+c7fe0ffc3fdfee256fdb05be1ff9e4fffe2facaffdee21c2797fff81fff227338bda54ecfd812daffd4fffe37d1ffa7f20e5ffc1fb895bf6c16f87fe793fff91eb2bff7b88709e5fffe1ffff0627338bda54ecfd812daffd4fffe4fd1ffbff203fff95f47ff0fc801f9000000000000000000000000000000000000000000000
 fffff87fd3bfffefd1bbbc003b28a9332837a20322bfa73070bef13f31038404f87f130c2f8a948ba78cb093940b3536b733b4363d35a323a41c9bd21c3e3daf2b2ba4ac2cb4b8208e860e2e0687082525a626f99aef2a2dbcaaa1a0772d2eba38aa5fffe2cd533b71c4e7a4efce1dffe4bef1f7fff1b86fc2711d49f8ba9d7e
 4bf9f3cffe9bc733f3dfa3f55dfb21c7efa57fe6e7bfc78924b0e6f7fc752fb27fe84fcf5fe7fafe9d7f7fe71fa7f5f9fee9cf2dcb9e3ff3f9ca71c670e2f1fc7fbb2733ffb74ffbff07fe1ffc5ff8f977f9d92ffe444ffcbff9bff538493993ff3a79fc7113ffbf3ffa3ff4ffeafea6bc9c5ee2fedfc7efffb7a59629df6ee2
 ffe67febfc67feca7ef139349fd7fe29ffb6f73ff5ffeb6ffcfcc913c6ffd0f65fcff092c92bff77a0ffd0ffdfe59144f47c3213ff3dffe1ffc7ff94b2492449be87e33ff9fff493ffadfd3bf249b6c6964ffe53affedffdfffc3ffbfff998ffd19ffea7ffbff1e773ffe1c1fff7fff7fff00fffe0ffe5a5fc1bff34fe9ff92f
