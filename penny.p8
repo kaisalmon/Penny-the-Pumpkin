@@ -25,8 +25,8 @@ player = {
 	w=8,
 	bounce=0,
 	size=14,
-	tsize=14,
 	speed=.2,
+	pumpkin=true,
 	h={
 		x=0,
 		y=0,
@@ -513,7 +513,7 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 	   * ch.dy) * t_scale
 	ch.h.dx -= 0.04 * ch.h.dx * t_scale
 	ch.h.dy -= 0.05 * ch.h.dy * t_scale
-	local h = ch.size * ch.stretch
+	local h = ch.size * ch.stretch * (ch.pumpkin and 1 or 1.1)
 	if(not ch.gnded and not ch.was_gnded) h=ch.size
 	local fh=0.015
 	if(ch.size < 12)fh*=2 
@@ -553,9 +553,6 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 		eject_particle(ch.h, 0.5, 1)
 	end	
 
-	local delta_s = ch.tsize - ch.size
-	ch.size += delta_s*0.2* t_scale
-	check_for_squeeze(ch)
 	ch.was_gnded = ch.gnded
 	ch.prev_block = ch.block
 	
@@ -1708,8 +1705,7 @@ function spawn_enemy(e)
 		dy=0,
 		w=8,
 		bounce=0,
-		size=e.size or 12,
-		tsize=e.size or 12,
+		size=e.pumpkin and 12 or 14,
 		speed=0.07,
 		jumpf=-4.5,
 		h={
