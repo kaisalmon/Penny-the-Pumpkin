@@ -31,6 +31,7 @@ player = {
 		x=0,
 		y=0,
 		important=true,
+		head=true,
 		dx=0,
 		dy=0,
 		w=8,
@@ -531,7 +532,7 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 	if ch.h.y + min_h > ch.y then
 		if(ch.h.dy>0)ch.h.dy *= -1
 		ch.h.y = ch.y-min_h
-		eject_particle(ch.h, 0.5, 1)
+		eject_particle(ch.h,false, 0.5, 1)
 		if (ch.y != ch.h.y+min_h) then
 			ch.y = ch.h.y+min_h
 			ch.dy *= -1 * ch.bounce
@@ -550,7 +551,7 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 	local max_h = ch.size*ch.stretch*1.25
 	if ch.h.y + max_h < ch.y then
 		ch.h.y = ch.y-max_h
-		eject_particle(ch.h, 0.5, 1)
+		eject_particle(ch.h, false, 0.5, 1)
 	end	
 
 	ch.was_gnded = ch.gnded
@@ -698,7 +699,15 @@ function check_for_squeeze(p)
 	end
 end
 
-function is_colide(x,y,w,inc_semi, h)
+function foo()
+	for x=cam_x,cam_x+128 do
+		for y=cam_y,cam_y+128 do
+			pset(x-cam_x,y-cam_y,is_solid(x,y) and 8 or is_solid(x,y, true) and 12 or 3)
+		end
+	end
+end
+
+function is_colide(x,y,w, inc_semi, h)
 	local xs,ys = {x},{y}
 	if w then 
 		xs = {}
@@ -720,9 +729,9 @@ function is_colide(x,y,w,inc_semi, h)
 	return false
 end
 
-function eject_particle(p, x, y)
+function eject_particle(p,inc_semi, x, y)
 	if(not p.important) return
-	if not is_colide(p.x, p.y, p.w,false) then
+	if not is_colide(p.x, p.y, p.w,inc_semi) then
 		return
 	end
 	local ty1,ty2=p.y,p.y
@@ -734,22 +743,22 @@ function eject_particle(p, x, y)
 	 tx1-=x
 	 tx2+=x
 		i+=1
-	 local collide_ty1 = is_colide(p.x, ty1, p.w,false)
+	 local collide_ty1 = is_colide(p.x, ty1, p.w,inc_semi)
 	 if not collide_ty1 then
 	  p.y = ty1
 	  break
 	 end
-	 local collide_ty2 = is_colide(p.x, ty2, p.w,false)
+	 local collide_ty2 = is_colide(p.x, ty2, p.w,inc_semi)
 	 if not collide_ty2 then
 	  p.y = ty2
 	  break
 	 end
-	 local collide_tx1 = is_colide(tx1, p.y, p.w,false)
+	 local collide_tx1 = is_colide(tx1, p.y, p.w,inc_semi)
 	 if not collide_tx1 then
 	  p.x = tx1
 	  break
 		end
-	 local collide_tx2 = is_colide(tx2, p.y, p.w,false)
+	 local collide_tx2 = is_colide(tx2, p.y, p.w,inc_semi)
 	 if not collide_tx2 then
 	  p.x = tx2
 	  break
@@ -759,7 +768,7 @@ function eject_particle(p, x, y)
 end	
 
 function update_particle(p, inc_semi)
-	eject_particle(p, 1, 1)
+	eject_particle(p,p.dy>0 and not p.head, 1, 1)
 
 	x_col = is_colide(p.x+p.dx,p.y,p.w,false)
 	if not x_col then
@@ -1545,15 +1554,15 @@ end
 transition_function = nil
 
 function set_checkpoint(level, x,y,dx,dy)
-		if x != nil then
+	if x != nil then
 		level.px = x
 	end
 	if y != nil then
 		level.py = y
 	end
+	
 	level.pdx = dx or 0
 	level.pdy = dy or 0
-	
 	
 	for i, v in ipairs(levels) do
 		 if v == level and not speedrun then
@@ -1572,6 +1581,8 @@ function transition(func)
 end
 
 function load_level_instant(level,x,y,dx,dy)
+	dx=dx or 0
+	dy=dy or 0
 	reload(
 		0x1000,
 		0x1000,
@@ -1607,10 +1618,10 @@ function load_level_instant(level,x,y,dx,dy)
 	end
 	player.h.x = player.x
 	player.h.y = player.y-player.size
-	player.dx = level.pdx
-	player.dy = level.pdy
-	player.h.dx = level.pdx
-	player.h.dy = level.pdy
+	player.dx = dx
+	player.dy = dy
+	player.h.dx = dx
+	player.h.dy = dy
 	
 	enemies={}
 	coins={}
@@ -1633,7 +1644,7 @@ function load_level_instant(level,x,y,dx,dy)
 	cam_y = player.y - 100
 	
 	check_for_squeeze(player)
-	eject_particle(player, 1, 1)	
+	eject_particle(player,false, 1, 1)	
 	
 	if #coins == 0 then
 		coin_at=time()
@@ -1648,30 +1659,6 @@ function load_level_instant(level,x,y,dx,dy)
 				add(animated_tiles, {x=x, y=y})
 			end
 		end
-	end
-end
-
-
-function set_checkpoint(level, x,y,dx,dy)
-	if x != nil then
-		level.px = x
-	end
-	if y != nil then
-		level.py = y
-	end
-	level.pdx = dx or 0
-	level.pdy = dy or 0
-	
-	
-	for i, v in ipairs(levels) do
-		 if v == level then
-		 	dset(63, i)
-		 	dset(62, flr(level.px/8))
-		 	dset(61, flr(level.py/8))
-		 	dset(60, flr(level.pdx))
-		 	dset(59, flr(level.pdy))
-		 	break
-		 end
 	end
 end
 
@@ -1715,6 +1702,7 @@ function spawn_enemy(e)
 		h={
 			x=e.x*8,
 			y=e.y*8-14,
+			head=true,
 			important=true,
 			dx=0,
 			dy=0,
@@ -2031,7 +2019,7 @@ llllllllllllllllllllllllllllllllll5ll5m0jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
 llllllllllllllllllllllllllllllllllllll50jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
 
 __gff__
-0000010602818a060606000000000000000101020a0202020202000000000000000101000002020000000000000000000001010000818a0606060000000000000a050a0a0a0a060606000000000002020a0a0a0a0a0a0000000000000a0000020a0a0a0a0a0a0200000000000000000a0a0a0a010a0a0a0a0a0200000000000a
+0000010602818a060606000000000000000101020a0202020202000000000000000101000002020000000000000000000001010000818a0606060000000000000a0a0a0a0a0a060606000000000002020a0a0a0a0a0a0000000000000a0000020a0a0a0a0a0a0200000000000000000a0a0a0a010a0a0a0a0a0200000000000a
 00000000020200000000000000000000000000000202020200000000000000000000000a060202020000000000000000000000008a000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
 2a2b0001020076a3787777780a0b107677787979795200500708094042002c2d373839104a4b4c4d10070809ecec7dd87ed97d001d0c1c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
