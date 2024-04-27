@@ -1044,7 +1044,7 @@ level1={
 	c={
 		{x=17,y=2.75,id=1}
 	},
-    blocks="1:32,2:5,3:16,4:9,5:0,6:0,rx:2,colide:false|1:32,2:12,3:16,4:1,5:0,6:8,ry:5,rx:2,colide:false|1:15,2:9,3:4,4:3,5:15,6:9,colide:false|1:0,2:3,3:32,4:16,5:0,6:0,update:level1_adj|1:27,2:0,3:2,4:2,5:1,6:12,on_crash:crash_breakable,key:level1_breakable",
+    blocks="1:32,2:5,3:16,4:9,5:0,6:0,rx:2,colide:false|1:32,2:12,3:16,4:1,5:0,6:8,ry:5,rx:2,colide:false|1:15,2:9,3:4,4:3,5:15,6:9,colide:false|1:0,2:3,3:32,4:16,5:0,6:0,update:level1_adj|1:27,2:0,3:2,4:2,5:1,6:11.875,on_crash:crash_breakable,key:level1_breakable",
 }
 level2_adj=function()
     if player.x < 0 and player.y < 100 then
@@ -1270,8 +1270,8 @@ level7 = {
 	pal=day,
 	chunk=3+chunk_size*3,
 	e={
-		{x=55/8,y=2,size=6, miny=100,minx=35, maxx=60, pumpkin=true},
-		{x=65/8,y=2,size=6, miny=100,minx=35, maxx=60, pumpkin=true},		
+		{x=55/8,y=2,size=5, miny=100,minx=35, maxx=60, pumpkin=true},
+		{x=65/8,y=2,size=5, miny=100,minx=35, maxx=60, pumpkin=true},		
 		{x=45/8,y=2, miny=100,minx=35, maxx=60, pumpkin=true}
 	},
 	c={
@@ -1691,7 +1691,7 @@ function spawn_enemy(e)
 		dy=0,
 		w=8,
 		bounce=0,
-		size=e.pumpkin and 12 or 14,
+		size=e.size or e.pumpkin and 12 or 14,
 		speed=0.07,
 		jumpf=-4.5,
 		h={
