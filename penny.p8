@@ -974,7 +974,7 @@ crash_breakable =  function(b)
 		broken_blocks[b.key] = true
 	end
 	for i = 0,35 do
-		add_dust({x=player.x,y=player.y+16,w=16},0,0,true,55,"coin")
+		add_dust({x=b[5]*8+8,y=b[6]*8+8,w=16},0,0,true,55,"coin")
 	end
 	local x = -5
 	player.dy=x
@@ -1186,10 +1186,10 @@ level5={
 		{x=33,y=11,miny=20,  maxy=100, minx=250, maxx=330}
 	},
 	c={
-		{x=40,y=13,id=10},
+		{x=45.5,y=10.5,id=10},
 		{x=4,y=-4,id=17},
 	},
-	blocks="1:35,2:0,3:6,4:3,5:4,6:5,colide:false,rx:9|1:35,2:0,3:48,4:8,5:0,6:8,colide:false,fill:6|1:111,2:9,3:6,4:5,5:19,6:2,update:drop_island|1:41,2:0,3:3,4:3,5:14,6:-2,update:drop_island|1:111,2:9,3:6,4:5,5:11,6:11,update:drop_island|1:111,2:14,3:7,4:5,5:17,6:7,update:drop_island|1:41,2:0,3:3,4:3,5:12,6:5,update:drop_island|1:96,2:3,3:15,4:11,5:0,6:0|1:96,2:14,3:15,4:5,5:0,6:11,front:true|1:100,2:16,3:11,4:3,5:15,6:13,rx:4,front:true|1:6,2:0,3:3,4:3,5:44,6:12,update:level5_adj|1:11,2:6,3:4,4:6,5:2,6:-3|1:118,2:3,3:4,4:16,5:50,6:0"
+	blocks="1:35,2:0,3:6,4:3,5:4,6:5,colide:false,rx:9|1:35,2:0,3:48,4:8,5:0,6:8,colide:false,fill:6|1:111,2:9,3:6,4:5,5:19,6:2,update:drop_island|1:41,2:0,3:3,4:3,5:13,6:-1.5,update:drop_island|1:111,2:9,3:6,4:5,5:11,6:11,update:drop_island|1:111,2:14,3:7,4:5,5:17,6:7,update:drop_island|1:41,2:0,3:3,4:3,5:12,6:5,update:drop_island|1:96,2:3,3:15,4:11,5:0,6:0|1:96,2:14,3:15,4:5,5:0,6:11,front:true|1:100,2:16,3:11,4:3,5:15,6:13,rx:4,front:true|1:6,2:0,3:3,4:3,5:44,6:12,update:level5_adj|1:11,2:6,3:4,4:6,5:2,6:-3|1:118,2:3,3:4,4:16,5:50,6:0"
 }
 level6_adj=function()
     if player.x < -2 then 
@@ -1451,24 +1451,13 @@ end
 function is_solid(x, y,inc_semi)
 	for b in all(blocks) do
 		if b.colide != false then
-			local w,h=b[3]*(b.rx or 1), b[4]*(b.ry or 1)
-								
+			local w,h=b[3]*(b.rx or 1), b[4]*(b.ry or 1)				
 			if x/8 > b[5]
 			and x/8 < b[5]+w
 			then
 				if y/8 > b[6]
 				and y/8 < b[6]+h
 				then
-					if b.rx then
-						x-=b[5]*8
-						x%=b[3]*8
-						x+=b[5]*8
-					end
-					if b.ry then
-						y-=b[6]*8
-						y%=b[4]*8
-						y+=b[6]*8
-					end
 					local tile = is_solid_in_block(b,x,y,inc_semi)
 					if tile then
 						return b, tile
@@ -1481,16 +1470,26 @@ function is_solid(x, y,inc_semi)
 end
 
 function is_solid_in_block(b, e_x, e_y, inc_semi)
+	if b.rx then
+		e_x-=b[5]*8
+		e_x%=b[3]*8
+		e_x+=b[5]*8
+	end
+	if b.ry then
+		e_y-=b[6]*8
+		e_y%=b[4]*8
+		e_y+=b[6]*8
+	end
 	local x = e_x/8 + b[1] - b[5]
 	local y = e_y/8 + b[2] - b[6]
 	local tile = mget(x,y)
 	if fget(tile, 2) then
 		if(not inc_semi) return false
-		if(y*8 % 8 > 4) return false
+		if(y % 1 > 1/2) return false
 		return tile
 	end
 	if fget(tile, 0) then
-		if(y*8 % 8 < 5) return false
+		if(y % 1 < 1/2)return false
 		return tile	
 	end
 	if fget(tile, 3) then
@@ -1718,7 +1717,7 @@ end
 function _init()
 	if(label)poke(0x5f2c,3)
 	poke(0x5f34,0x2)
-	cartdata("kai-pumpkin-2-v1-0")
+	cartdata("kai-pumpkin-2-v1-1")
 	coins_collected=0
 	init()
 	for i = 0,30 do
@@ -2023,12 +2022,12 @@ __map__
 2a2b0001020076a3787777780a0b107677787979795200500708094042002c2d373839104a4b4c4d10070809ecec7dd87ed97d001d0c1c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 3a3b001112005051525151521a1b1050515266666652005017181960620000007071724a4b5b5b4c4d174f19fcfd00000000001d0d6a0e1c000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 3738397072005051525151521010106061624e4e4e547755171819a0a10000000000005a5b5b5b5b5d272829e1e2e3e40000000d6a6a6a0ec0c1c1c20000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-fffff87fd3bfffe1a9003528be880b8c0cbb3bd1b8b0a81a8384f1a222b129bca02abf028333300436b7319b9c1ca733b43c722a363d35943e3daf70a17121bfd2209b12930ffc69f99f9db626e2486e7aef279ee9f34fc3f13893e713f2fc784fc38fcedd7ff1bf3ffc8b6fe9fafe87e2e3f6fd7f5fd4bf7bfba7f073f9cb7f
+fffff87fd3bfffe1a9003528be880b8c0cbb3bd1b8b0a81a8384f1a222b129bca02abf028333300436b7319b9c1ca733b43c722a363d35943e3daf70a17120a1bfd21b12930ffc69f99f9db626e2486e7aef279ee9f34fc3f13893e713f2fc784fc38fcedd7ff1bf3ffc8b6fe9fafe87e2e3f6fd7f5fd4bf7bfba7f073f9cb7f
 9e787f49fda4ff3fde4fc161fa4ff9b7ea8ffd8ecffc09e4e475ef3fb7fe1a4afaf37f7e3ff104e79fdeffe3f1f9cfdfff227f36717ff25ffc13abff97ff34ffc01ff92bf5dceffc9ff92bff3f57ff17f5ff875ffd1ffa7ff55e3ff5dfab93f29ff89f94fdfff01faf73e713ff67fedeec917f6ffdd3f39ff89fcb893e68ffd6
 dffbf8fe1d1f91f9c073baf7f6713fdff7f0b3ff8712ff1ce97f99c6dffc3ff77fe104e1cdedd8e0032cc7f2fe36ffd27fe2affe3ffca4ffe774b64b769f9ffe8ffe91ff8c707b7a9c0e9651cf4fedff8ec98fc61fa03f19ffd64bffd84b7c9fcc4ffee90c47e3e953c75d9c2a59df1f9fff89117fa392953f1503c2a71c71ff
-93a4e61f6e3ffc89ffe98ee7ea5e93f79fbf6772c9c495fc83f0257fe50e24bc5fc7ffcbd7a9fca3ffdff86bd7739ebdfbf0fc3f4fd3f4e9cf125fc4af07e4ffc3c1d2793f0fc127fe473cf3cf7f9734e274fcb7e0ffcbff9f97ff24fff95474fd2a74fde9d5ffe9ffabffefe51ffe4fe26e2f2573209c93f473f87fdffa0fd9
-f9f9f7d1164df87268f64fdffe1c21cedff48c59ffeac82fe13fff27ffa769dbf03f5bb7e6ffc446ffc9fb7fe4aed39fe5feb42c2c584e3f6fdbf94d01636251ebffe13ada7a920fc192774a7bbf1fd399c3fff804fc38fffe0fe7ff97fff84e4d25b3f2ffd9ca44ed082125dc9c5fcff4fd6dffbff5ffe0b27e2e7ff5cfe97a
-9129ed7fff09d5cfc50f0ef8d2eaebf7fddfcfe9ffadca1fbd9a27fdfffb9410ff61735479c1e21c737f1fe6ce9ffbbff4ffeaffd7fdfbf8c81048e4d4ed02f2fe4e240824726a768179ffff0627338bda54ecfd812daffd4fffe4fd1ffbff203fff95f47ff0fc801f9000000000000000000000000000000000000000000000
+93a4e61f6e3ffc89ffe98ee7ea5e93f79fbf6772c9c495fc83f0247ffb4ffdce24a2dfc7ffcbd7a9fca3ffe7f86bd7739ebdfbf0fc3f4fd3f4e9cf125fc4af07fe14f27e1f824ffc8e79e79eff2e69c4e9f96fc1ff97ff3f2ffe49fff6a8e9fa54e9fbd3abffd3ff57ffefd5fc4dc5e4ae669c93f473f87fdffa0fd9f9f9f7d1
+164df87268f64fdffe1c21cedff48c59ffeac82fe13ffda7ffa769dbf03f5ad1ff888dff93f6ffc95da73fcbfd685858b09c7edfb7f29a02c6c4a3d7ffd275b4f5241f8324ee429eefc7f4e670fffe013f0e3fff83f9ffe5fffe1393496cfcbff672913b420849772717f3fd3f5b7feffd7ff82c9f8b9ffd73fa5ea44a7b5fff
+c27573f143c3be34babafdff77f3fa7feb7287ef6689ff7ffbe507fe185cd51e7078871cdfc7f9b3a7feeffd3ffabff5ff7efe32041239353b40bc80d4ed02f2fe4e240824726a768179ffff0627338bda54ecfd812daffd4fffe4fd1ffbff203fff95f47ff0fc801f9000000000000000000000000000000000000000000000
 fffff87fd3bffd6a400c0c28aa2a0de4688c4bcfe6e70723c7ce6a6a883c480aac6c8e4e0845c0c6a866cb8fafc2495b71c71273d5d7bbc74e35f3d9fb4f9307d38e36e3df6e9f83f19ef52756a7e6bccfc3973f8fe5f9f7f9f80f0d27e0b3df74e38fd9f8fedd731d3cfca3c5dc61e4da3cb568fd04fd1cd95fa3affd13f576
 de70fa6773f057e3a47f53f657efc6e1559522713ff96693d54f215bf01d613f59fc7f3276bbf2f3cf2464945123ffa51f855b626dec95485fcecfd28e4f61fbcfe9e97378fc41f8899ecfeffcfea271fbffb666b2ac9047e7d7fdff81ff87affc5784a1fd7e6ff7f2e12f2f27e9533f5d274eca009617e9f34ff536ffa3a58f
 e6493e7df9afd7fe931f9d9567fe3750ff841a755c4faed5269527293f149524491102449c0fcd387ed7ff27fe4ffc9f94b167309cc8fcab989c35fdb9e66e4efff4f1cba9cf09fe7925fc3f0fc272391f94ffcae3bf387480e0b117d8d3c7fe221fcc99377a7f57a6fd67fe6bc2339e10b274e6bc7fbff9e7e3f8f97c93f224
