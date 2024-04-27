@@ -535,7 +535,7 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 	update_character_w(ch)
 	check_for_squeeze(ch)
 
-	local max_h = ch.size*ch.stretch*1.25
+	local max_h = ch.size*ch.stretch*1.5
 	if ch.h.y + max_h < ch.y then
 		ch.h.y = ch.y-max_h
 		eject_particle(ch.h, false, 0.5, 1)
@@ -608,7 +608,7 @@ function update_character_w(ch)
 	local tw=(32 - h * (25 / 20))/14*s
 	tw=min(tw, 30/16*s)
 	tw=max(tw, 4)
-	ch.w = lerp(ch.w,tw,1)
+	ch.w = tw
 	ch.h.w = ch.w
 end
 
@@ -658,18 +658,16 @@ end
 -->8
 --physics
 function check_for_squeeze(p)
-	if(p != player)return
-	
 	if is_solid(p.x,p.y) then 
 		return false
 	end
 	while true do
-		local right_col = is_solid(p.x+p.w/2+1, p.y) and is_solid(p.h.x+p.h.w/2+1, p.y)
-		local left_col = is_solid(p.x-p.w/2-1, p.y) and is_solid(p.h.x-p.h.w/2-1, p.y)
+		local right_col = is_solid(p.x+p.w/2+1, p.y) or is_solid(p.h.x+p.h.w/2+1, p.h.y)
+		local left_col = is_solid(p.x-p.w/2-1, p.y) or is_solid(p.h.x-p.h.w/2-1, p.h.y)
 		p.w-=1
 		p.h.w-=1
 		if right_col and left_col then 
-			if 	is_solid(p.h.x, p.h.y-1) 	then 
+			if 	is_solid(p.h.x, p.h.y-1) then 
 				p.y += 1
 				p.h.y += 1
 			else
@@ -757,7 +755,7 @@ end
 function update_particle(p, inc_semi)
 	eject_particle(p,p.dy>=0 and not p.head, 1, 1)
 
-	x_col = is_colide(p.x+p.dx,p.y,p.w,false)
+	x_col = is_colide(p.x+p.dx*t_scale,p.y,p.w,false)
 	if not x_col then
 		p.x += p.dx*t_scale
 	else
@@ -768,7 +766,7 @@ function update_particle(p, inc_semi)
 	p.dy=min(p.dy,4)
 	p.dy=max(p.dy,-10)
 
-	y_col,tile = is_colide(p.x,p.y+p.dy,p.w,inc_semi)
+	y_col,tile = is_colide(p.x,p.y+p.dy*t_scale,p.w,inc_semi)
 	if not y_col  then
 		 p.y += p.dy*t_scale
 	else
