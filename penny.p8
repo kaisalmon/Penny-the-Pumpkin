@@ -642,12 +642,11 @@ function on_land(p)
 end
 
 function die()
-assert(false)
 	if died_at then
 		return
 	end
-	sfx(4)
 	if (debug) return
+	sfx(4)
 	died_at = time()
 	for i = 0,15 do
 		add_dust(player, player.dx,player.dy,true,55)
