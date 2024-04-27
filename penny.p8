@@ -523,9 +523,6 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 		if (ch.y != ch.h.y+min_h) then
 			ch.y = ch.h.y+min_h
 			ch.dy *= -1 * ch.bounce
-			if is_solid(ch.x,ch.y, true) and ch == player then
-				die()
-			end
 		end
 	end
 
@@ -645,6 +642,7 @@ function on_land(p)
 end
 
 function die()
+assert(false)
 	if died_at then
 		return
 	end
@@ -1606,7 +1604,7 @@ function load_level_instant(level,x,y,dx,dy)
 	calc_cam_bounds()
 	manual_cam=false
 	
-	local h= player.y-player.h.y
+	local h= max(player.y-player.h.y-1, 4)
 	player.x = level.px or player.x
 	player.y = level.py or player.y
 	if player.last_gnded_y != "override" then 
