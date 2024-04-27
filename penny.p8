@@ -1606,13 +1606,14 @@ function load_level_instant(level,x,y,dx,dy)
 	calc_cam_bounds()
 	manual_cam=false
 	
+	local h= player.y-player.h.y
 	player.x = level.px or player.x
 	player.y = level.py or player.y
 	if player.last_gnded_y != "override" then 
 		player.last_gnded_y = player.y
 	end
 	player.h.x = player.x
-	player.h.y = player.y-player.size
+	player.h.y = player.y-h
 	player.dx = dx
 	player.dy = dy
 	player.h.dx = dx
@@ -1639,7 +1640,7 @@ function load_level_instant(level,x,y,dx,dy)
 	cam_y = player.y - 100
 	
 	check_for_squeeze(player)
-	eject_particle(player,false, 1, 1)	
+	--eject_particle(player,false, 1, 1)	
 	
 	if #coins == 0 then
 		coin_at=time()
