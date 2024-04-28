@@ -229,14 +229,7 @@ function _draw()
 	end	
 end
 
-local min_mem = 0x5f70
-local max_mem = 0x5f70 + 18
 
-function pal_memset(addr, val, len)
-    if addr >= min_mem and (addr + len - 1) <= max_mem then
-        memset(addr, val, len)
-    end
-end
 
 function draw_wipe_transition(wipe_progress)
     if(wipe_progress <0)return
