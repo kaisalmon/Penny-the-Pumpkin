@@ -166,13 +166,30 @@ function _draw()
 		print(flr(player.x)..","..flr(player.y).." "..tostr(debug),1,1,7)
 	end
 	
-	camera(0,hud_y)
-	local hud_h=25
-	for i = 0,16 do
-		spr(32,i*8,128-hud_h)
+	if hud_y<=-24 then
+		hud_pos=nil
+	elseif hud_pos == nil then 
+		if player.y - cam_y > 100 then
+			hud_pos=⬆️
+		else 
+			hud_pos=⬇️
+		end
 	end
-	rectfill(0,128+8-hud_h,128,128,0)
-	sspr(24,0,16,16,3,109,16,16)
+	local hud_h=25
+	if hud_pos==⬇️ then
+		camera(0,hud_y)
+	else
+		camera(0,128-24-hud_y)
+	end
+    fillp(▒)
+	rectfill(0,128-hud_h, 128, 128,0)
+    fillp(0)
+	if hud_pos==⬇️ then
+		rectfill(0,128-hud_h+4, 128, 128,0)
+	else
+		rectfill(0,128-hud_h, 128, 124,0)
+	end
+	sspr(24,0,16,16,3,108,16,16)
 
 	if coins_collected == max_coins and
 	not speedrun 
@@ -187,6 +204,7 @@ function _draw()
 	if shake==25 then
 		rectfill(0,0,128,128,9)
 	end
+
 	camera()
 	if speedrun then
 		rectfill(99,0,128,6,0)
@@ -1047,7 +1065,7 @@ level2_adj=function()
             load_level(level3, 30, -15)
         end
     elseif player.x > 384 then
-        load_level(level6, 5, 90)		
+        load_level(level6, 5, 100)		
     end
 end
 level2={
@@ -1184,7 +1202,7 @@ level6_adj=function()
         if player.y<15 then
             load_level(level7, 295, 5)
         else
-            load_level(level2, 380, 32)
+            load_level(level2, 375, 39)
         end
     elseif player.x > 258 then
         load_level(level4, 16, player.y+15)	
@@ -1646,6 +1664,7 @@ function load_level_instant(level,x,y,dx,dy)
 			end
 		end
 	end
+	update_camera()
 end
 
 function load_level(level, x, y, dx, dy)
