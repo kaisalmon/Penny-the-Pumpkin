@@ -50,7 +50,7 @@ load_level_instant(
 	levels[level] or level1,
 	 (dget(63)!=0 and (dget(62)*8+4) or level1.px),
  	(dget(63)!=0 and (dget(61)*8+4) or level1.py),
-  dget(60), dget(59)
+  dget(60), dget(59), dget(58)
   )
 hud_y=-25
 g1=0.1
@@ -169,7 +169,7 @@ function _draw()
 	if hud_y<=-24 then
 		hud_pos=nil
 	elseif hud_pos == nil then 
-		if player.y - cam_y > 100 then
+		if player.y - cam_y > 80 then
 			hud_pos=⬆️
 		else 
 			hud_pos=⬇️
@@ -376,7 +376,7 @@ function update_coin(c)
 			sr_coins[c.id]=true
 			coins_collected+=1
 			coin_at=time()
-			set_checkpoint(blocks,c.x,c.y-5,0,0)
+			set_checkpoint(blocks,c.x,c.y-5,0,0,16)
 
 			for i = 0,15 do
 				add_dust(c,rnd(),1,true,55,"coin")
@@ -1138,7 +1138,7 @@ level4_adj = function()
         if player.y < 150 then
             load_level(level6,240,player.y-25)
         else
-            load_level(level6,195,215)
+            load_level(level6,195,215,0,0,2)
         end
     elseif player.x > 388 then
         load_level(level5, 0, player.y < 30 and 23 or 79)		
@@ -1556,7 +1556,7 @@ function calc_cam_bounds()
 end
 transition_function = nil
 
-function set_checkpoint(level, x,y,dx,dy)
+function set_checkpoint(level, x,y,dx,dy,h)
 	if x != nil then
 		level.px = x
 	end
@@ -1566,6 +1566,7 @@ function set_checkpoint(level, x,y,dx,dy)
 	
 	level.pdx = dx or 0
 	level.pdy = dy or 0
+	level.ph = h or 16
 	
 	for i, v in ipairs(levels) do
 		 if v == level and not speedrun then
@@ -1574,6 +1575,7 @@ function set_checkpoint(level, x,y,dx,dy)
 		 	dset(61, flr(level.py/8))
 		 	dset(60, flr(level.pdx))
 		 	dset(59, flr(level.pdy))
+		 	dset(58, flr(level.ph))
 		 	break
 		 end
 	end
@@ -1583,7 +1585,7 @@ function transition(func)
     wipe_progress = 0  -- start wipe effect
 end
 
-function load_level_instant(level,x,y,dx,dy)
+function load_level_instant(level,x,y,dx,dy,h)
 	dx=dx or 0
 	dy=dy or 0
 	reload(
@@ -1603,8 +1605,8 @@ function load_level_instant(level,x,y,dx,dy)
 		)
 		px9_decomp(0,3,working_ram_addr,mget,mset)
 	end
-	set_checkpoint(level, x,y,dx,dy)
-	
+	set_checkpoint(level, x,y,dx,dy,player.y-player.h.y)
+
 	blocks=level
 	for b in all(blocks) do
 		if broken_blocks[b.key] then 
@@ -1614,14 +1616,13 @@ function load_level_instant(level,x,y,dx,dy)
 	calc_cam_bounds()
 	manual_cam=false
 	
-	local h= max(player.y-player.h.y-1, 4)
 	player.x = level.px or player.x
 	player.y = level.py or player.y
 	if player.last_gnded_y != "override" then 
 		player.last_gnded_y = player.y
 	end
 	player.h.x = player.x
-	player.h.y = player.y-h
+	player.h.y = player.y-4
 	player.dx = dx
 	player.dy = dy
 	player.h.dx = dx
@@ -1667,12 +1668,12 @@ function load_level_instant(level,x,y,dx,dy)
 	update_camera()
 end
 
-function load_level(level, x, y, dx, dy)
+function load_level(level, x, y, dx, dy, h)
 	if blocks == level then
-		load_level_instant(level, x, y, dx, dy)
+		load_level_instant(level, x, y, dx, dy, h)
 	else
 		transition(function()
-			 load_level_instant(level, x, y, dx, dy)
+			 load_level_instant(level, x, y, dx, dy, h)
 		end)
 	end
 end
