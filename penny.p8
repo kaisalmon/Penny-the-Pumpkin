@@ -96,7 +96,6 @@ function draw_entity(e,pal_overide,x,y)
 			e.h.x+(x or 0)+d[1],
 			e.h.y-((blocks == level9 or e.pumpkin) and 4 or 0)+(y or 0)+d[2],
 			e.w+4,
-			e.size,
 			e.pumpkin and 80 or blocks == level9 and 80 or  8,
 			e.pumpkin and 16 or blocks == level9 and 0 or 0
 	
@@ -149,8 +148,8 @@ function _draw()
 				player.h.x,
 				player.h.y-4,
 				player.w+4,
-				player.size,
-				44,
+				96,
+				112,
 				player.facing==⬅️
 			)
 		end
@@ -240,15 +239,15 @@ function _draw()
 		pal(4,i==7 and 4 or 0)
 		pal(10,i==7 and 10 or 0)
 		sspr(40,76,87,27, v[1]-10,v[2]+3)
-			if is_halloween() then
-				print("happy halloween",x,title_y+15,9)
-	else
-		if time()%1.5 < .75 then
-			print("director's cut",v[1]+24,v[2]+32,9)
+		if is_halloween() then
+			print("happy halloween",v[1]+24,v[2]+32,9)
 		else
-			print("by kai salmon",v[1]+24,v[2]+32,9)
+			if time()%1.5 < .75 then
+				print("director's cut",v[1]+24,v[2]+32,9)
+			else
+				print("by kai salmon",v[1]+24,v[2]+32,9)
+			end
 		end
-	end
 	end	
 end
 
@@ -637,14 +636,13 @@ function update_character_w(ch)
 	ch.h.w = ch.w
 end
 
-function skw_spr(x,y,hx,hy, w, size, sx, sy)
-	if(not sy) return
+function skw_spr(x,y,hx,hy, w, sx, sy, flip)
 	local h = y-hy+1
 	if (h<0)h=0
 	for i=1,h do
 		local s = i/h*16
 		local skew_x=lerp(x,hx,i/h)
-		sspr(sx,sy+16-s,16,1,skew_x-w/2,y-i+1,w,1)
+		sspr(sx,sy+16-s,16,1,skew_x-w/2,y-i+1,w,1, flip)
 	end
 end
 
