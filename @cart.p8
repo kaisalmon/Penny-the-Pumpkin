@@ -382,7 +382,7 @@ function _update60()
 			sfx(11,3)
 		end
 	end
-	if player.last_gnded_y != "override" and will_smash(player) then
+	if will_smash() then
 		sfx(9,3)
 	else
 		sfx(9,-2)
