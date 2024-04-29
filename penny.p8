@@ -224,8 +224,14 @@ function _draw()
 		print(m..":"..s.."."..ms,100,1,7)
 	end
 	
-	local x=30
+	draw_logo()
+end
 
+function draw_logo()
+	if title_y > 128 then
+		return
+	end
+	local x=30
 	for i,v in ipairs({
 		{x-1,title_y},
 		{x+1,title_y},
@@ -250,8 +256,6 @@ function _draw()
 		end
 	end	
 end
-
-
 
 function draw_wipe_transition(wipe_progress)
     if(wipe_progress <0)return
