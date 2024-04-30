@@ -1418,14 +1418,15 @@ level1_v_cam = function()
 	cam_bounds[3]=-200
 	local t=(time()-last_level_load_at)/5
 	if player.y < -15 then 
-		if t < 1 then
-			manual_cam=true
-			cam_x=-30
+		manual_cam=true
+		cam_x=-30
+		if t < 1 and been_level1_v_down != true and (not speedrun or speedrun_t > 45) then
 			cam_y=lerp(-190,-150,-6*(t*t*t/3-t*t/2))
 		else
 			cam_y=-150
 		end
 	else
+		been_level1_v_down = true
 		manual_cam=false
     end
 end
@@ -1772,7 +1773,7 @@ function _init()
 			coin_at=time()		
 		end
 	end
-	speedrun=coins_collected>=max_coins
+	speedrun=true--coins_collected>=max_coins
 	init()
 	if(speedrun)speedrun_init()
 end
