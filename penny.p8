@@ -451,18 +451,18 @@ function update_camera()
 	*0.1
 	
 			
-	if cam_x > player.x - 64 + 50 then
-		cam_x = player.x - 64 + 50
-	end
-	if cam_x < player.x - 64 - 50 then
-		cam_x = player.x - 64 - 50
-	end
-	if cam_y > player.y - 64 + 50 then
-		cam_y = player.y - 64 + 50
-	end
-	if cam_y < player.y - 64 - 50 then
-		cam_y = player.y - 64 - 50
-	end
+	-- if cam_x > player.x - 64 + 50 then
+	-- 	cam_x = player.x - 64 + 50
+	-- end
+	-- if cam_x < player.x - 64 - 50 then
+	-- 	cam_x = player.x - 64 - 50
+	-- end
+	-- if cam_y > player.y - 64 + 50 then
+	-- 	cam_y = player.y - 64 + 50
+	-- end
+	-- if cam_y < player.y - 64 - 50 then
+	-- 	cam_y = player.y - 64 - 50
+	-- end
 	
 	if cam_x < cam_bounds[1] then
 		cam_x = cam_bounds[1]
@@ -1368,6 +1368,7 @@ level9_draw =function()
 end
 level9_adj = function()
     if player.x > 180 then
+		manual_cam=true
         load_level(level1_variant,-25,-49)
     elseif player.x < 16 then
         player.x=16
@@ -1397,8 +1398,11 @@ level9={
 	blocks="1:0,2:0,3:0,4:0,5:0,6:0,draw:level9_draw|1:55,2:3,3:11,4:16,5:0,6:0,update:level9_adj|1:66,2:3,3:12,4:16,5:11,6:-2|1:55,2:3,3:1,4:4,5:0,6:-4|1:44,2:15,3:3,4:4,5:9,6:5|1:31,2:17,3:3,4:2,5:20,6:-4|1:62,2:3,3:2,4:4,5:7,6:-4|1:31,2:11,3:5,4:1,5:16,6:9|1:31,2:12,3:5,4:1,5:11.5,6:10|1:31,2:13,3:5,4:1,5:6.5,6:8|1:31,2:14,3:5,4:1,5:1,6:11|1:43,2:11,3:12,4:2,5:11,6:14|1:78,2:3,3:23,4:14,5:0,6:14|1:47,2:17,3:3,4:2,5:3,6:-2"
 }
 local stars = {}
-for i=0,45 do
-	add(stars,{rnd(150)-30,-50-rnd(105),0})
+for i=0,15 do
+	add(stars,{rnd(150)-50,-50-rnd(32),0})
+	add(stars,{rnd(150)-50,-82-rnd(32),0})
+	add(stars,{rnd(150)-50,-114-rnd(32),0})
+	add(stars,{rnd(150)-50,-146-rnd(32),0})
 end
 level1_v_draw = function()
     -- Draw stars
@@ -1411,8 +1415,18 @@ level1_v_draw = function()
     ovalfill(70,-127,90,-107,1)
 end
 level1_v_cam = function()
-    if player.y < -15 then 
-        cam_y-=4
+	cam_bounds[3]=-200
+	local t=(time()-last_level_load_at)/5
+	if player.y < -15 then 
+		if t < 1 then
+			manual_cam=true
+			cam_x=-30
+			cam_y=lerp(-190,-150,-6*(t*t*t/3-t*t/2))
+		else
+			cam_y=-150
+		end
+	else
+		manual_cam=false
     end
 end
 level1_variant={
@@ -1608,6 +1622,7 @@ end
 function load_level_instant(level,x,y,dx,dy,h)
 	dx=dx or 0
 	dy=dy or 0
+	last_level_load_at=time()
 	reload(
 		0x1000,
 		0x1000,
@@ -1634,7 +1649,6 @@ function load_level_instant(level,x,y,dx,dy,h)
 		end
 	end
 	calc_cam_bounds()
-	manual_cam=false
 	
 	player.x = level.px or player.x
 	player.y = level.py or player.y
@@ -1665,13 +1679,15 @@ function load_level_instant(level,x,y,dx,dy,h)
 		end
 	end
 	
-	cam_x = player.x - 64
-	cam_y = player.y - 64
-	
+	if not manual_cam then
+		cam_x = player.x - 64
+		cam_y = player.y - 64
+	end
+	manual_cam=false
 	check_for_squeeze(player)
 	--eject_particle(player,false, 1, 1)	
 	
-	if #coins == 0 then
+	if #coins == 0 and blocks!=level1_variant then
 		coin_at=time()
 	end
 
