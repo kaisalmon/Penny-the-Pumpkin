@@ -696,13 +696,13 @@ function check_for_squeeze(p)
 	end
 end
 
-function foo()
-	for x=cam_x,cam_x+128 do
-		for y=cam_y,cam_y+128 do
-			pset(x-cam_x,y-cam_y,is_solid(x,y) and 8 or is_solid(x,y, true) and 12 or 3)
-		end
-	end
-end
+-- function get_solid()
+-- 	for x=cam_x,cam_x+128 do
+-- 		for y=cam_y,cam_y+128 do
+-- 			pset(x-cam_x,y-cam_y,is_solid(x,y) and 8 or is_solid(x,y, true) and 12 or 3)
+-- 		end
+-- 	end
+-- end
 
 function is_colide(x,y,w, inc_semi)
 	local xs,ys = {x},{y}
@@ -1162,12 +1162,12 @@ level4={
 	instrument=town_instrument,
 	c={
 		{x=4, y=23, id=7},
-		{x=352/8, y=120/8, id=8},
+		{x=44, y=15, id=8},
 		{x=27, y=3.5, id=9},
 		{x=39, y=27, id=13},
 	},
 	e={
-		{x=352/8, y=120/8, 
+		{x=44, y=15, 
 		pumpkin=true, 
 		minx=317,maxx=370,
 		miny=125, maxy=175},
@@ -1634,7 +1634,6 @@ function load_level_instant(level,x,y,dx,dy,h)
 		0x1000,
 		128*64
 	)
-
 	
 	if level.chunk then
 		local _addr = level.chunk<32 and 0x2000+128*level.chunk or 0x1000+128*(level.chunk-32)
@@ -1710,6 +1709,12 @@ function load_level_instant(level,x,y,dx,dy,h)
 	if level.instrument then
 		update_note(1,0,level.instrument)
 	end
+	
+	if(dget(57) == 1) then
+		mute()
+	else
+		unmute()
+	end
 	update_camera()
 end
 
@@ -1769,11 +1774,11 @@ end
 -->8
  --init
 function _init()
+	cartdata("kai-pumpkin-2-v1-1")
 	music(0,500)
- poke(0x5f5c, 255)
+ 	poke(0x5f5c, 255)
 	if(label)poke(0x5f2c,3)
 	poke(0x5f34,0x2)
-	cartdata("kai-pumpkin-2-v1-1")
 	coins_collected=0
 	init()
 	for i = 0,30 do
@@ -1785,7 +1790,6 @@ function _init()
 	speedrun=coins_collected>=max_coins
 	init()
 	if(speedrun)speedrun_init()
-	menuitem(1,"mute music", toggle_mute)
 end
 
 function add_speedrun_option()
@@ -1857,13 +1861,14 @@ end
 
 function mute()
 	muted=true
+	dset(57, 1)
 	update_note(1,0,0)
 	update_note(0,0,0)
 	menuitem(1,"unmute music", toggle_mute)
 end
-
 function unmute()
 	muted=false
+	dset(57, 0)
 	update_note(1,0,blocks.instrument or forest_instrument)
 	update_note(0,0,3608)
 	menuitem(1,"mute music", toggle_mute)
