@@ -1028,7 +1028,7 @@ drop = function(b)
 	end
 	
 	if b[6] - b.oy > 100 then
-    b.t, b[6], b.dy = -60, b.oy, 0
+    	b.t, b[6], b.dy = -60, b.oy, 0
 	end
 end
 
@@ -1294,6 +1294,10 @@ end
 level7_sin2=function(b)
     b[6]=sin(time()/3)-5
 end
+level7_island=function(b)
+	local dy = sin(t/2+b[5]*5.314)/50
+	b[6]+=dy
+end
 level7 = {
 	pal=day,
 	chunk=3+chunk_size*3,
@@ -1305,7 +1309,7 @@ level7 = {
 	c={
 		{x=55/8,y=-3, id=12},
 	},
-	blocks="1:16,2:15,3:37,4:5,5:0,6:-3,update:level7_adj,fill:6,colide:false|1:16,2:15,3:37,4:4,5:0,6:2,colide:false,fill:3|1:48,2:16,3:16,4:3,5:-11,6:-6,rx:3|1:16,2:15,3:21,4:4,5:-26,6:-2,rx:3|1:16,2:13,3:21,4:2,5:-26,6:4,rx:3|1:41,2:11,3:7,4:8,5:3,6:-2|1:37,2:12,3:4,4:7,5:15,6:-4,update:level7_sin1|1:29,2:5,3:6,4:5,5:14,6:-6|1:37,2:12,3:4,4:7,5:25,6:-5,update:level7_sin2|1:16,2:5,3:6,4:5,5:24,6:-7|1:24,2:5,3:5,4:6,5:32,6:0",
+	blocks="1:16,2:15,3:37,4:5,5:0,6:-3,update:level7_adj,fill:6,colide:false|1:16,2:15,3:37,4:4,5:0,6:2,colide:false,fill:3|1:48,2:16,3:16,4:3,5:-11,6:-6,rx:3|1:16,2:15,3:21,4:4,5:-26,6:-2,rx:3|1:16,2:13,3:21,4:2,5:-26,6:4,rx:3|1:41,2:11,3:7,4:8,5:3,6:-2|1:37,2:12,3:4,4:7,5:15,6:-4,update:level7_sin1|1:29,2:5,3:6,4:5,5:14,6:-6,update:level7_island|1:37,2:12,3:4,4:7,5:25,6:-5,update:level7_sin2|1:16,2:5,3:6,4:5,5:24,6:-7,update:level7_island|1:24,2:5,3:5,4:6,5:32,6:0",
 }
 function draw_light(x,y,c,r)
 	ovalfill(x-r,y-r,x+r,y+r,c)
@@ -1773,7 +1777,7 @@ function _init()
 			coin_at=time()		
 		end
 	end
-	speedrun=true--coins_collected>=max_coins
+	speedrun=coins_collected>=max_coins
 	init()
 	if(speedrun)speedrun_init()
 end
