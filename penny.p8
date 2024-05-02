@@ -1421,10 +1421,13 @@ end
 level1_v_cam = function()
 	cam_bounds[3]=-200
 	local t=(time()-last_level_load_at)/5
+	if disable_drama == nil then 
+		disable_drama =(not speedrun or speedrun_t > 45)
+	end
 	if player.y < -15 then 
 		manual_cam=true
 		cam_x=-30
-		if t < 1 and been_level1_v_down != true and (not speedrun or speedrun_t > 45) then
+		if t < 1 and  been_level1_v_down != true and  disable_drama then
 			cam_y=lerp(-190,-150,-6*(t*t*t/3-t*t/2))
 		else
 			cam_y=-150
@@ -1707,7 +1710,10 @@ function load_level_instant(level,x,y,dx,dy,h)
 		end
 	end
 	if level.instrument then
+		prev_instrument = level.instrument
 		update_note(1,0,level.instrument)
+	else
+		update_note(1,0, prev_instrument)
 	end
 	
 	if(dget(57) == 1) then
@@ -1869,7 +1875,7 @@ end
 function unmute()
 	muted=false
 	dset(57, 0)
-	update_note(1,0,blocks.instrument or forest_instrument)
+	update_note(1,0,blocks.instrument or prev_instrument or forest_instrument)
 	update_note(0,0,3608)
 	menuitem(1,"mute music", toggle_mute)
 end
