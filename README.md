@@ -1,8 +1,10 @@
-# Penny the Pumpkin
+![Penny the Pumpkin](https://github.com/kaisalmon/Penny-the-Pumpkin/blob/main/logo.png)
 
 A **metroidvania-style platformer** developed for the PICO-8 fantasy console. Originally released in **March 2024** with a major **Director's Cut expansion** in **May 2024**, showcasing iterative development and community engagement.
 
 *PICO-8 is a "fantasy console" that emulates 1980s hardware limitations - 128x128 resolution, 16 colors, 32KB memory limit - requiring creative optimization and efficient programming.*
+
+![Trailer GIF](https://github.com/kaisalmon/Penny-the-Pumpkin/blob/main/Trailer.gif) 
 
 🎮 **[Play on itch.io](https://kaisalmon.itch.io)**
 
