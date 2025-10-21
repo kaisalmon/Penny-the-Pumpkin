@@ -244,7 +244,7 @@ test.describe("Physics - Jump Mechanics", function()
   test.it("should apply stronger jump force to head", function()
     local head_jumpf = character.jumpf * 1.2
     character.h.dy = head_jumpf
-    test.assert.equal(character.h.dy, -3.6)
+    test.assert.approximately(character.h.dy, -3.6, 0.0001)
   end)
 
   test.it("should only jump when moving downward or stationary", function()

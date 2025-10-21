@@ -7,6 +7,9 @@
 
 local Mock = {}
 
+-- Save original Lua functions that we'll override
+local _lua_print = print
+
 -- Global state for mocking
 Mock.state = {
   time_value = 0,
@@ -243,9 +246,14 @@ function sspr(sx, sy, sw, sh, dx, dy, dw, dh, flip_x, flip_y)
   table.insert(Mock.draw_calls, {type = "sspr", sx = sx, sy = sy, sw = sw, sh = sh, dx = dx, dy = dy, dw = dw, dh = dh, flip_x = flip_x, flip_y = flip_y})
 end
 
-function print(text, x, y, col)
+-- Note: We use a local reference instead of overriding global print()
+-- to avoid breaking Lua's require() mechanism
+function _pico8_print(text, x, y, col)
   table.insert(Mock.draw_calls, {type = "print", text = text, x = x, y = y, col = col})
 end
+
+-- Provide pico8 print as a mock function, not as global override
+Mock.pico8_print = _pico8_print
 
 function pset(x, y, col)
   table.insert(Mock.draw_calls, {type = "pset", x = x, y = y, col = col})
