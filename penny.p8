@@ -105,7 +105,6 @@ function will_smash(p)
 	return p.last_gnded_y=="override" or p.y - p.last_gnded_y > 120 
 end
 function _draw()
-	local stat_1 = stat(1)
 	cls(1)
 	reset_pal()
 
@@ -119,7 +118,7 @@ function _draw()
 		time()%.3>.15
 		foreach(enemies, draw_entity)
 			
-	if died_at == nil and not flicker then 
+	if not died_at and not flicker then
 		if heart_thought_t>1 or hold_thought_t > 4 then
 			spr(time()%1.5 > .75 and 229 or 231,player.x-5,player.h.y-20,2,2)
 			if hold_thought_t > 4 then
@@ -159,9 +158,8 @@ function _draw()
 	-- circ(blocks.px, blocks.py, 16, 7)
 	camera()
 	draw_wipe_transition(wipe_progress)
-	local draw_cpu_usage = stat(1) - stat_1
 
-	
+
 	if hud_y<=-24 then
 		hud_pos=nil
 	elseif hud_pos == nil then 
@@ -193,13 +191,9 @@ function _draw()
 		print("speedrun unlocked in menu!",22,115,fc % 10 < 5 and 6 or 7)
 	else
 		print(coins_collected.."/"..max_coins,22,115,6)
-		if #coins==0 then
-			print("area complete",70,115,6)
-		end
+		if(#coins==0)print("area complete",70,115,6)
 	end
-	if shake==25 then
-		rectfill(0,0,128,128,9)
-	end
+	if(shake==25)rectfill(0,0,128,128,9)
 
 	camera()
 	if speedrun then
@@ -267,18 +261,10 @@ function draw_wipe_transition(wipe_progress)
 end
 
 function _update60()
-	profile_cpu_usage=0
-	profile_calls=0
-	
-	
-
-	local stat_1 = stat(1)
 	t+=1/60
 	fc+=1
 	
-	if btn(0) or btn(1) then
-		moved=true
-	end
+	if(btn(0) or btn(1))moved=true
 	title_center_y=label and 30 or 50
 	if title_y < title_center_y-5 then
 		title_y = lerp(title_y, title_center_y,0.02)
@@ -288,19 +274,13 @@ function _update60()
 		title_y = title_y + title_dy
 	end
 	local thud_y = -25
-	if coin_at and coin_at+2>time() then
-		thud_y = 0
-	end
+	if(coin_at and coin_at+2>time())thud_y=0
 	if coins_collected == max_coins and
 	not speedrun then	
 		add_speedrun_option()
 		thud_y = 0
 	end
-	if hud_y > thud_y then
-		hud_y -= 1
-	elseif hud_y < thud_y then
-		hud_y += 1
-	end
+	if(hud_y!=thud_y)hud_y+=sgn(thud_y-hud_y)
 
  if wipe_progress >= 0 then
   wipe_progress += 0.03  -- adjust this value to control the speed of the transition
@@ -316,9 +296,7 @@ function _update60()
  
  update_camera()
 	
- if moved and coins_collected < max_coins then
-		speedrun_t+=1/60
-	end
+ if(moved and coins_collected<max_coins)speedrun_t+=1/60
 	
 	if died_at and died_at < time() - 1 then
 		load_level_instant(blocks,blocks.px,blocks.py,blocks.pdx,blocks.pdy)
@@ -326,9 +304,7 @@ function _update60()
 		revived_at = time()
 	end
 
-	if not died_at then
-		update_player()
-	end
+	if(not died_at)update_player()
 	
 	for e in all(enemies) do
 		update_enemy(e)
@@ -349,10 +325,9 @@ function _update60()
 				if tile_id == 62 then mset(x, y, 30)
 				elseif tile_id == 46 then mset(x, y, 62)
 				elseif tile_id == 30 then mset(x, y, 46)
-				end
-			end
-			if fc%10 == 0 and tile_id >= 208 and tile_id <= 211then
+				elseif tile_id >= 208 and tile_id <= 211 then
 	  	mset(x, y, (tile_id+1)%4+208)
+				end
 			end
 			if (fc+x*123+y)%40 == 0 then
 				if tile_id == 60 then mset(x, y, 126)
@@ -440,18 +415,10 @@ function update_camera()
 	*0.1
 
 	
-	if cam_x < cam_bounds[1] then
-		cam_x = cam_bounds[1]
-	end
-	if cam_x > cam_bounds[2] then
-		cam_x = cam_bounds[2]
-	end
-	if cam_y < cam_bounds[3] then
-		cam_y = cam_bounds[3]
-	end
-	if cam_y > cam_bounds[4] then
-		cam_y = cam_bounds[4]
-	end
+	if(cam_x<cam_bounds[1])cam_x=cam_bounds[1]
+	if(cam_x>cam_bounds[2])cam_x=cam_bounds[2]
+	if(cam_y<cam_bounds[3])cam_y=cam_bounds[3]
+	if(cam_y>cam_bounds[4])cam_y=cam_bounds[4]
 end
 
 function lerp(a, b, t)
@@ -466,15 +433,13 @@ function update_character(ch, move_dir, jump, t_stretch, jump_held)
 
 
 	t_stretch= t_stretch or 1 
-	if not ch.gnded and not ch.block then
-		t_stretch=1
-	end
+	if(not ch.gnded and not ch.block)t_stretch=1
 	
 	ch.stretch = ch.stretch and (
 		 lerp(ch.stretch, t_stretch, .1)
 	) or t_stretch
 	
-	ch.gnded = not not ch.block
+	ch.gnded = ch.block
 	if ch.gnded then
 		ch.last_gnded=time()
 		ch.jumped_on_blob = false
@@ -575,16 +540,15 @@ function get_bounding_box(p)
   return {x = x, y = y, w = w , h = h}
 end
 
-function do_characters_overlap_forgiving(p1, p2)
-  local bbox1 = get_bounding_box_forgiving(p1)
-  local bbox2 = get_bounding_box_forgiving(p2)
-  return not (bbox1.x + bbox1.w < bbox2.x or bbox2.x + bbox2.w < bbox1.x or bbox1.y + bbox1.h > bbox2.y or bbox2.y + bbox2.h > bbox1.y)
+function _overlap(p1,p2,f)
+  local a,b=f(p1),f(p2)
+  return not(a.x+a.w<b.x or b.x+b.w<a.x or a.y+a.h>b.y or b.y+b.h>a.y)
 end
-
-function do_characters_overlap(p1, p2)
-  local bbox1 = get_bounding_box(p1)
-  local bbox2 = get_bounding_box(p2)
-  return not (bbox1.x + bbox1.w < bbox2.x or bbox2.x + bbox2.w < bbox1.x or bbox1.y + bbox1.h > bbox2.y or bbox2.y + bbox2.h > bbox1.y)
+function do_characters_overlap_forgiving(p1,p2)
+  return _overlap(p1,p2,get_bounding_box_forgiving)
+end
+function do_characters_overlap(p1,p2)
+  return _overlap(p1,p2,get_bounding_box)
 end
 
 
@@ -605,9 +569,7 @@ function update_player()
 		if(rnd()<.3)add_dust(player)
 	end
 	
-	if player.y > 2000 then
-		die()
-	end
+	if(player.y>2000)die()
 	
 end
 
@@ -649,25 +611,18 @@ function on_land(p)
 end
 
 function die()
-	if died_at then
-		return
-	end
-	if (debug) return
+	if(died_at)return
 	sfx(60)
 	died_at = time()
 	for i = 0,15 do
 		add_dust(player, player.dx,player.dy,true,55)
 	end
-	if revived_at and time() - revived_at < 0.1 then
-		load_first_level()
-	end
+	if(revived_at and time()-revived_at<0.1)load_first_level()
 end
 -->8
 --physics
 function check_for_squeeze(p)
-	if is_solid(p.x,p.y) then 
-		return false
-	end
+	if(is_solid(p.x,p.y))return false
 	while true do
 		local right_col = is_solid(p.x+p.w/2+1, p.y) or is_solid(p.h.x+p.h.w/2+1, p.h.y)
 		local left_col = is_solid(p.x-p.w/2-1, p.y) or is_solid(p.h.x-p.h.w/2-1, p.h.y)
@@ -692,17 +647,10 @@ function check_for_squeeze(p)
 	end
 end
 
--- function get_solid()
--- 	for x=cam_x,cam_x+128 do
--- 		for y=cam_y,cam_y+128 do
--- 			pset(x-cam_x,y-cam_y,is_solid(x,y) and 8 or is_solid(x,y, true) and 12 or 3)
--- 		end
--- 	end
--- end
 
 function is_colide(x,y,w, inc_semi)
-	local xs,ys = {x},{y}
-	if w then 
+	local xs={x}
+	if w then
 		xs = {}
 		for dx=0,w/2,7 do
 			add(xs, x+dx)
@@ -711,21 +659,17 @@ function is_colide(x,y,w, inc_semi)
 		add(xs, x+w/2)
 		add(xs, x-w/2)
 	end
-	
-	for _,y2 in ipairs(ys) do
-		for i,x2 in ipairs(xs) do
-			local b,tile = is_solid(x2,y2,inc_semi)
-			if(b)return b,tile
-		end
+
+	for i,x2 in ipairs(xs) do
+		local b,tile = is_solid(x2,y,inc_semi)
+		if(b)return b,tile
 	end
 	return false
 end
 
 function eject_particle(p,inc_semi, x, y)
 	if(not p.important) return
-	if not is_colide(p.x, p.y, p.w,inc_semi) then
-		return
-	end
+	if(not is_colide(p.x,p.y,p.w,inc_semi))return
 	local ty1,ty2=p.y,p.y
 	local tx1,tx2=p.x,p.x
 	local i = 0
@@ -735,23 +679,19 @@ function eject_particle(p,inc_semi, x, y)
 	 tx1-=x
 	 tx2+=x
 		i+=1
-	 local collide_ty1 = is_colide(p.x, ty1, p.w,inc_semi)
-	 if not collide_ty1 then
+	 if not is_colide(p.x, ty1, p.w,inc_semi) then
 	  p.y = ty1
 	  break
 	 end
-	 local collide_ty2 = is_colide(p.x, ty2, p.w,inc_semi)
-	 if not collide_ty2 then
+	 if not is_colide(p.x, ty2, p.w,inc_semi) then
 	  p.y = ty2
 	  break
 	 end
-	 local collide_tx1 = is_colide(tx1, p.y, p.w,inc_semi)
-	 if not collide_tx1 then
+	 if not is_colide(tx1, p.y, p.w,inc_semi) then
 	  p.x = tx1
 	  break
-		end
-	 local collide_tx2 = is_colide(tx2, p.y, p.w,inc_semi)
-	 if not collide_tx2 then
+	 end
+	 if not is_colide(tx2, p.y, p.w,inc_semi) then
 	  p.x = tx2
 	  break
 	 end
@@ -779,20 +719,9 @@ function update_particle(p, inc_semi)
 	else
 		local override_bounce = false
 		if p.important then
-			if p.dy > -.1 then
-				p.block = y_col
-			end
-			if p==player or p==player.h then
-				if fget(tile, 7) and not fget(tile, 1) then 
-					die()
-				end
-				if fget(tile, 7) and fget(tile, 1) then 
-					die()
-				end
-			end
-			if p.on_land  then
-				override_bounce = p.on_land(p)
-			end
+			if(p.dy>-.1)p.block=y_col
+			if((p==player or p==player.h) and fget(tile,7))die()
+			if(p.on_land)override_bounce=p.on_land(p)
 		end
 		if not override_bounce then
 			p.dy *= -(p.bounce or 0)
@@ -916,12 +845,8 @@ end
 --dust
 function add_dust(ch, dy, dx,fullh, t, type)
 	if(ch != player and type!="coin")return
-	if stat(7)<60 then
-		deli(dust, 1)	
-	end
-	if #dust > 30 then
-		deli(dust, 1)	
-	end
+	if(stat(7)<60)deli(dust,1)
+	if(#dust>30)deli(dust,1)
 	add(dust, {
 			x=ch.x
 				+(rnd()-.5)*ch.w,
@@ -975,9 +900,7 @@ end
 local chunk_size=6
 crash_breakable =  function(b)
 	b[3]=0
-	if b.key then
-		broken_blocks[b.key] = true
-	end
+	if(b.key)broken_blocks[b.key]=true
 	for i = 0,35 do
 		add_dust({x=b[5]*8+8,y=b[6]*8+8,w=16},0,0,true,55,"coin")
 	end
@@ -1020,7 +943,6 @@ function drop_island(b)
 end
 
 tunnel=split("0,-16,-4,1,0,5,6,8,-3,-10,12,12,	1,14,15")
-spooky_tunnel= split("0,130,131,132,0,5,13,136,137,9,3,12,13,8,4")
 forest_pal=split("138,2,3,4,147,6,7,8,9,10,11,12,13,-4,15")
 spooky_pal = split("128,130,131,132,133,5,134,136,137,9,3,12,13,8,4")
 day=split("-4,2,3,4,5,6,7,8,9,10,11,12,13,14,15")
@@ -1102,12 +1024,8 @@ level3_draw = function ()
     fillp(0)
 end
 level3_adj = function()		
-    if player.x < 850 and player.x > 250 then
-        player.y = max(2,player.y)
-    end
-    if player.x < -10 then
-        load_level(level8, 196,183)
-    end
+    if(player.x<850 and player.x>250)player.y=max(2,player.y)
+    if(player.x<-10)load_level(level8,196,183)
     if player.y<0 then
         if player.x < 70 then
             player.x = 16
@@ -1241,9 +1159,7 @@ level6_adj=function()
      end
 end
 level6_halo=function()
-    if not broken_blocks.level6_breakable and player.y > 125 then
-       draw_dark_halo(40)
-    end
+    if(not broken_blocks.level6_breakable and player.y>125)draw_dark_halo(40)
 end
 level6_bg=function()
    if broken_blocks.level6_breakable then
@@ -1404,10 +1320,9 @@ level9={
 }
 local stars = {}
 for i=0,15 do
-	add(stars,{rnd(150)-50,-50-rnd(32),0})
-	add(stars,{rnd(150)-50,-82-rnd(32),0})
-	add(stars,{rnd(150)-50,-114-rnd(32),0})
-	add(stars,{rnd(150)-50,-146-rnd(32),0})
+	for j=0,3 do
+		add(stars,{rnd(150)-50,-50-32*j-rnd(32),0})
+	end
 end
 level1_v_draw = function()
     -- Draw stars
@@ -1583,30 +1498,18 @@ function calc_cam_bounds()
 	cam_bounds = {1000,-1000,1000,-1000}
 	for b in all(blocks) do
 		if b.update != drop and b.update != drop_island and b.colide!=false then
-			if cam_bounds[1] > b[5]*8 then
-				cam_bounds[1] = b[5]*8
-			end
-			if cam_bounds[2] < (b[5]+b[3]*(b.rx or 1))*8 -128 then
-				cam_bounds[2] = (b[5]+b[3]*(b.rx or 1))*8 -128
-			end
-			if cam_bounds[3] > b[6]*8 then
-				cam_bounds[3] = b[6]*8
-			end
-			if cam_bounds[4] < (b[6]+b[4]*(b.ry or 1))*8-128 then
-				cam_bounds[4] = (b[6]+b[4]*(b.ry or 1))*8-128 
-			end
+			cam_bounds[1]=min(cam_bounds[1],b[5]*8)
+			cam_bounds[2]=max(cam_bounds[2],(b[5]+b[3]*(b.rx or 1))*8-128)
+			cam_bounds[3]=min(cam_bounds[3],b[6]*8)
+			cam_bounds[4]=max(cam_bounds[4],(b[6]+b[4]*(b.ry or 1))*8-128)
 		end
 	end 
 end
 transition_function = nil
 
 function set_checkpoint(level, x,y,dx,dy,h)
-	if x != nil then
-		level.px = x
-	end
-	if y != nil then
-		level.py = y
-	end
+	if(x!=nil)level.px=x
+	if(y!=nil)level.py=y
 	
 	level.pdx = dx or 0
 	level.pdy = dy or 0
@@ -1652,17 +1555,13 @@ function load_level_instant(level,x,y,dx,dy,h)
 
 	blocks=level
 	for b in all(blocks) do
-		if broken_blocks[b.key] then 
-			del(blocks,b)
-		end
+		if(broken_blocks[b.key])del(blocks,b)
 	end
 	calc_cam_bounds()
 	
 	player.x = level.px or player.x
 	player.y = level.py or player.y
-	if player.last_gnded_y != "override" then 
-		player.last_gnded_y = player.y
-	end
+	if(player.last_gnded_y!="override")player.last_gnded_y=player.y
 	player.h.x = player.x
 	player.h.y = player.y-4
 	player.dx = dx
@@ -1695,9 +1594,7 @@ function load_level_instant(level,x,y,dx,dy,h)
 	check_for_squeeze(player)
 	--eject_particle(player,false, 1, 1)	
 	
-	if #coins == 0 and blocks!=level1_variant then
-		coin_at=time()
-	end
+	if(#coins==0 and blocks!=level1_variant)coin_at=time()
 
 	animated_tiles = {}
 	for x=0,128 do
@@ -1822,32 +1719,6 @@ function is_halloween()
     local day = stat(92)
     return (month == 10 and day >= 25) or
            (month == 11 and day <= 7)
-end
-function num2hex(number)
-    local base = 16
-    local result = {}
-    local resultstr = ""
-
-    local digits = "0123456789abcdef"
-    local quotient = flr(number / base)
-    local remainder = number % base
-
-    add(result, sub(digits, remainder + 1, remainder + 1))
-
-  while (quotient > 0) do
-    local old = quotient
-    quotient /= base
-    quotient = flr(quotient)
-    remainder = old % base
-
-         add(result, sub(digits, remainder + 1, remainder + 1))
-  end
-
-  for i = #result, 1, -1 do
-    resultstr = resultstr..result[i]
-  end
-
-  return resultstr
 end
 
 function update_note(sfx_id, note_i, new_note)
